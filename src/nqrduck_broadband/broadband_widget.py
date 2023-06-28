@@ -186,4 +186,4 @@ class Ui_Form(object):
         self.label_10.setText(_translate("Form", "Sequence Settings:"))
         self.load_fileButton.setText(_translate("Form", "Load  TNMR File"))
         self.label_9.setText(_translate("Form", "Info Box:"))
-from contrib.mplwidget import MplWidget
+from nqrduck.contrib import MplWidget
