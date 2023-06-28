@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal, QObject
-from core.module.module_model import ModuleModel
+from nqrduck.module.module_model import ModuleModel
 
 
 class Broadband(ModuleModel):

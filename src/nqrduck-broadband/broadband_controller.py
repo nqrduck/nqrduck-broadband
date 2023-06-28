@@ -1,4 +1,4 @@
-from core.module.module_controller import ModuleController
+from nqrduck.module.module_controller import ModuleController
 
 
 class BroadbandController(ModuleController):
