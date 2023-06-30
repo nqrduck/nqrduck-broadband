@@ -1,3 +1,4 @@
+from PyQt5.QtCore import pyqtSlot
 from nqrduck.module.module_controller import ModuleController
 
 
@@ -8,6 +9,7 @@ class BroadbandController(ModuleController):
     def __init__(self, model):
         super().__init__(model)
 
+    @pyqtSlot(str)
     def change_start_frequency(self, value):
         value = float(value)
         if value > self.MIN_FREQUENCY:
@@ -15,6 +17,7 @@ class BroadbandController(ModuleController):
         else:
             self._model_start_frequency = self.MIN_FREQUENCY
 
+    @pyqtSlot(str)
     def change_stop_frequency(self, value):
         value = float(value)
         if value < self.MAX_FREQUENCY:

@@ -57,6 +57,7 @@ class BroadbandView(ModuleView):
         self._ui_form.broadbandPlot.canvas.draw()
         self._ui_form.broadbandPlot.canvas.flush_events()
 
+    @pyqtSlot(float)
     def on_stop_frequency_change(self, stop_frequency):
         self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=stop_frequency)
         self._ui_form.broadbandPlot.canvas.draw()
