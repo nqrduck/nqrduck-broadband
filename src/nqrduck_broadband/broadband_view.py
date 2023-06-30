@@ -1,4 +1,5 @@
 import logging
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget
 from nqrduck.module.module_view import ModuleView
 from .broadband_widget import Ui_Form
@@ -50,6 +51,7 @@ class BroadbandView(ModuleView):
         self._ui_form.frequency_domainPlot.canvas.ax.set_xlabel("time in us")
         self._ui_form.frequency_domainPlot.canvas.ax.set_ylabel("Amplitude a.u.")
 
+    @pyqtSlot(float)
     def on_start_frequency_change(self, start_frequency):
         self._ui_form.broadbandPlot.canvas.ax.set_xlim(left=start_frequency)
         self._ui_form.broadbandPlot.canvas.draw()
