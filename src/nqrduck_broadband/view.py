@@ -2,7 +2,7 @@ import logging
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget
 from nqrduck.module.module_view import ModuleView
-from .broadband_widget import Ui_Form
+from .widget import Ui_Form
 
 logger = logging.getLogger(__name__)
 
