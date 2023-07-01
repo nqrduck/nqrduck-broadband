@@ -8,27 +8,28 @@ logger = logging.getLogger(__name__)
 
 
 class BroadbandView(ModuleView):
-    def __init__(self, _model, controller):
-        super().__init__(_model, controller)
+
+    def __init__(self, module):
+        super().__init__(module)
 
         widget = QWidget()
         self._ui_form = Ui_Form()
-        self._ui_form.setupUi(widget)
-        self._model.widget = widget
+        self._ui_form.setupUi(self)
+        self.widget = widget
 
         self._ui_form.start_frequencyField.editingFinished.connect(
-            lambda: self._controller.change_start_frequency(
+            lambda: self._module._controller.change_start_frequency(
                 self._ui_form.start_frequencyField.text()
             )
         )
         self._ui_form.stop_frequencyField.editingFinished.connect(
-            lambda: self._controller.change_stop_frequency(
+            lambda: self._module._controller.change_stop_frequency(
                 self._ui_form.stop_frequencyField.text()
             )
         )
 
-        self._model.start_frequency_changed.connect(self.on_start_frequency_change)
-        self._model.stop_frequency_changed.connect(self.on_stop_frequency_change)
+        self._module._model.start_frequency_changed.connect(self.on_start_frequency_change)
+        self._module._model.stop_frequency_changed.connect(self.on_stop_frequency_change)
 
         self.init_plots()
 
