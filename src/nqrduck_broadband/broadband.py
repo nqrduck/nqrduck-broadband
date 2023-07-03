@@ -5,4 +5,4 @@ from nqrduck_broadband.view import BroadbandView
 from nqrduck_broadband.controller import BroadbandController
 from nqrduck_broadband.widget import Ui_Form
 
-Broadband = Module(BroadbandModel, BroadbandController, BroadbandView)
+Broadband = Module(BroadbandModel, BroadbandView, BroadbandController)
