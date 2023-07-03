@@ -15,7 +15,7 @@ class BroadbandController(ModuleController):
         if value > self.MIN_FREQUENCY:
             self._model.start_frequency = value
         else:
-            self._model_start_frequency = self.MIN_FREQUENCY
+            self._model.start_frequency = self.MIN_FREQUENCY
 
     @pyqtSlot(str)
     def change_stop_frequency(self, value):
