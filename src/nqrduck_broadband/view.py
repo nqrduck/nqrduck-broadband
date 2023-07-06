@@ -1,5 +1,5 @@
 import logging
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import QMetaMethod, pyqtSlot
 from PyQt5.QtWidgets import QWidget
 from nqrduck.module.module_view import ModuleView
 from .widget import Ui_Form
@@ -17,6 +17,12 @@ class BroadbandView(ModuleView):
         self._ui_form.setupUi(self)
         self.widget = widget
 
+        self._connect_signals()
+        
+
+        self.init_plots()
+
+    def _connect_signals(self) -> None:
         self._ui_form.start_frequencyField.editingFinished.connect(
             lambda: self._module._controller.change_start_frequency(
                 self._ui_form.start_frequencyField.text()
@@ -30,8 +36,8 @@ class BroadbandView(ModuleView):
 
         self._module._model.start_frequency_changed.connect(self.on_start_frequency_change)
         self._module._model.stop_frequency_changed.connect(self.on_stop_frequency_change)
-
-        self.init_plots()
+        
+        self._ui_form.start_measurementButton.clicked.connect(lambda: self._module._controller.start_measurement_clicked())
 
     def init_plots(self):
         # Initialization of broadband spectrum
