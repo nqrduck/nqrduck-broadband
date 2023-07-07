@@ -1,6 +1,6 @@
 import logging
-from PyQt5.QtCore import QMetaMethod, pyqtSlot
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import QMetaMethod, pyqtSlot, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QMessageBox
 from nqrduck.module.module_view import ModuleView
 from .widget import Ui_Form
 
@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class BroadbandView(ModuleView):
+
+    start_measurement = pyqtSignal()
 
     def __init__(self, module):
         super().__init__(module)
@@ -37,8 +39,25 @@ class BroadbandView(ModuleView):
         self._module._model.start_frequency_changed.connect(self.on_start_frequency_change)
         self._module._model.stop_frequency_changed.connect(self.on_stop_frequency_change)
         
-        self._ui_form.start_measurementButton.clicked.connect(lambda: self._module._controller.start_measurement_clicked())
+        self._ui_form.start_measurementButton.clicked.connect(lambda: self.start_measurement_clicked())
+        self.start_measurement.connect(lambda: self._module._controller.start_measurement_clicked())
 
+    def start_measurement_clicked(self):
+        # Create a QMessageBox object
+        msg_box = QMessageBox()
+        msg_box.setText("Start the measurement?")
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        
+        # Set the default button to No
+        msg_box.setDefaultButton(QMessageBox.No)
+        
+        # Show the dialog and capture the user's choice
+        choice = msg_box.exec_()
+        
+        # Process the user's choice
+        if choice == QMessageBox.Yes:
+            self.start_measurement.emit()
+    
     def init_plots(self):
         # Initialization of broadband spectrum
         self._ui_form.broadbandPlot.canvas.ax.set_title("Broadband Spectrum")
