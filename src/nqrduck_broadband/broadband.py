@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt6.QtCore import pyqtSignal, QObject
 from nqrduck.module.module import Module
 from nqrduck_broadband.model import BroadbandModel
 from nqrduck_broadband.view import BroadbandView

@@ -1,6 +1,6 @@
 import logging
-from PyQt5.QtCore import QMetaMethod, pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QMessageBox
+from PyQt6.QtCore import QMetaMethod, pyqtSlot, pyqtSignal
+from PyQt6.QtWidgets import QWidget, QMessageBox
 from nqrduck.module.module_view import ModuleView
 from .widget import Ui_Form
 
