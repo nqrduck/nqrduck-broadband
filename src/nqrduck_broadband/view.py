@@ -26,23 +26,23 @@ class BroadbandView(ModuleView):
 
     def _connect_signals(self) -> None:
         self._ui_form.start_frequencyField.editingFinished.connect(
-            lambda: self._module._controller.change_start_frequency(
+            lambda: self.module._controller.change_start_frequency(
                 self._ui_form.start_frequencyField.text()
             )
         )
         self._ui_form.stop_frequencyField.editingFinished.connect(
-            lambda: self._module._controller.change_stop_frequency(
+            lambda: self.module._controller.change_stop_frequency(
                 self._ui_form.stop_frequencyField.text()
             )
         )
 
-        self._module._model.start_frequency_changed.connect(self.on_start_frequency_change)
-        self._module._model.stop_frequency_changed.connect(self.on_stop_frequency_change)
+        self.module._model.start_frequency_changed.connect(self.on_start_frequency_change)
+        self.module._model.stop_frequency_changed.connect(self.on_stop_frequency_change)
         
-        self._ui_form.start_measurementButton.clicked.connect(lambda: self.start_measurement_clicked())
-        self.start_measurement.connect(lambda: self._module._controller.start_measurement_clicked())
+        self._ui_form.start_measurementButton.clicked.connect(lambda: self._start_measurement_clicked())
+        self.start_measurement.connect(lambda: self.module._controller.start_measurement())
 
-    def start_measurement_clicked(self):
+    def _start_measurement_clicked(self):
         # Create a QMessageBox object
         msg_box = QMessageBox()
         msg_box.setText("Start the measurement?")

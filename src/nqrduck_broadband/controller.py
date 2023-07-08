@@ -17,20 +17,20 @@ class BroadbandController(ModuleController):
     def change_start_frequency(self, value):
         value = float(value)
         if value > self.MIN_FREQUENCY:
-            self._module._model.start_frequency = value
+            self.module._model.start_frequency = value
         else:
-            self._module._model.start_frequency = self.MIN_FREQUENCY
+            self.module._model.start_frequency = self.MIN_FREQUENCY
 
     @pyqtSlot(str)
     def change_stop_frequency(self, value):
         value = float(value)
         if value < self.MAX_FREQUENCY:
-            self._module._model.stop_frequency = value
+            self.module._model.stop_frequency = value
         else:
-            self._module._model.stop_frequency = self.MAX_FREQUENCY
+            self.module._model.stop_frequency = self.MAX_FREQUENCY
 
     @pyqtSlot()
-    def start_measurement_clicked(self):
+    def start_measurement(self):
         logger.debug("Start measurement clicked")
         self._module.nqrduck_signal.emit("start_measurement", "")
         
