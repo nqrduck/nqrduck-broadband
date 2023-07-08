@@ -1,6 +1,7 @@
 import logging
 from PyQt6.QtCore import QMetaMethod, pyqtSlot, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QMessageBox
+
 from nqrduck.module.module_view import ModuleView
 from .widget import Ui_Form
 
@@ -46,16 +47,16 @@ class BroadbandView(ModuleView):
         # Create a QMessageBox object
         msg_box = QMessageBox()
         msg_box.setText("Start the measurement?")
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         
         # Set the default button to No
-        msg_box.setDefaultButton(QMessageBox.No)
+        msg_box.setDefaultButton(QMessageBox.StandardButton.No)
         
         # Show the dialog and capture the user's choice
-        choice = msg_box.exec_()
+        choice = msg_box.exec()
         
         # Process the user's choice
-        if choice == QMessageBox.Yes:
+        if choice == QMessageBox.StandardButton.Yes:
             self.start_measurement.emit()
     
     def init_plots(self):
