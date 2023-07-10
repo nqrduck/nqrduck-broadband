@@ -65,6 +65,7 @@ class BroadbandView(ModuleView):
         self._ui_form.broadbandPlot.canvas.ax.set_xlim([0, 250])
         self._ui_form.broadbandPlot.canvas.ax.set_xlabel("Frequency in MHz")
         self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Amplitude a.u.")
+        # Make height of the broadbandPlot a little bit larger
 
         # Initialization of last measurement time domain
         self._ui_form.time_domainPlot.canvas.ax.set_title("Last Time Domain")
