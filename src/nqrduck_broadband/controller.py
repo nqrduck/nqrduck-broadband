@@ -32,5 +32,4 @@ class BroadbandController(ModuleController):
     @pyqtSlot()
     def start_measurement(self):
         logger.debug("Start measurement clicked")
-        self._module.nqrduck_signal.emit("start_measurement", "")
-        
+        self.module.nqrduck_signal.emit("start_measurement", None)
