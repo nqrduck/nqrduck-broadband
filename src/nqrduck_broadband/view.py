@@ -1,5 +1,5 @@
 import logging
-from PyQt6.QtCore import QMetaMethod, pyqtSlot, pyqtSignal
+from PyQt6.QtCore import pyqtSlot, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QMessageBox
 
 from nqrduck.module.module_view import ModuleView
@@ -20,9 +20,10 @@ class BroadbandView(ModuleView):
         self._ui_form.setupUi(self)
         self.widget = widget
 
-        self._connect_signals()
-        
+        logger.debug("Facecolor %s" % str(self._ui_form.broadbandPlot.canvas.ax.get_facecolor()))
 
+        self._connect_signals()
+    
         self.init_plots()
 
     def _connect_signals(self) -> None:
@@ -60,24 +61,27 @@ class BroadbandView(ModuleView):
             self.start_measurement.emit()
     
     def init_plots(self):
+
         # Initialization of broadband spectrum
         self._ui_form.broadbandPlot.canvas.ax.set_title("Broadband Spectrum")
         self._ui_form.broadbandPlot.canvas.ax.set_xlim([0, 250])
         self._ui_form.broadbandPlot.canvas.ax.set_xlabel("Frequency in MHz")
         self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Amplitude a.u.")
-        # Make height of the broadbandPlot a little bit larger
+        self._ui_form.broadbandPlot.canvas.ax.grid()
 
         # Initialization of last measurement time domain
         self._ui_form.time_domainPlot.canvas.ax.set_title("Last Time Domain")
         self._ui_form.time_domainPlot.canvas.ax.set_xlim([0, 250])
         self._ui_form.time_domainPlot.canvas.ax.set_xlabel("time in us")
         self._ui_form.time_domainPlot.canvas.ax.set_ylabel("Amplitude a.u.")
+        self._ui_form.time_domainPlot.canvas.ax.grid()
 
         # Initialization of last measurement frequency domain
         self._ui_form.frequency_domainPlot.canvas.ax.set_title("Last Frequency Domain")
         self._ui_form.frequency_domainPlot.canvas.ax.set_xlim([0, 250])
         self._ui_form.frequency_domainPlot.canvas.ax.set_xlabel("time in us")
         self._ui_form.frequency_domainPlot.canvas.ax.set_ylabel("Amplitude a.u.")
+        self._ui_form.frequency_domainPlot.canvas.ax.grid()
 
     @pyqtSlot(float)
     def on_start_frequency_change(self, start_frequency):
