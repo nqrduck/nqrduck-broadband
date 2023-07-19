@@ -11,15 +11,31 @@ class BroadbandController(ModuleController):
 
     start_measurement = pyqtSignal()
 
+    set_averages_failure = pyqtSignal()
+
     def __init__(self, module):
         super().__init__(module)
+        
 
     @pyqtSlot(str, object)
     def process_signals(self, key: str, value: Measurement):
         if key == "measurement_data":
             logger.debug("Received single measurement.")
             self.module.model.single_measurement = value
+
+        elif key == "failure_set_averages" and value == self.module.view._ui_form.averagesEdit.text():
+            logger.debug("Received set averages failure.")
+            self.set_averages_failure.emit()
         
+    @pyqtSlot(str)
+    def set_frequency(self, value):
+        logger.debug("Setting frequency to: " + value)
+        self.module.nqrduck_signal.emit("set_frequency", value)
+
+    @pyqtSlot(str)
+    def set_averages(self, value):
+        logger.debug("Setting averages to: " + value)
+        self.module.nqrduck_signal.emit("set_averages", value)
 
     @pyqtSlot(str)
     def change_start_frequency(self, value):

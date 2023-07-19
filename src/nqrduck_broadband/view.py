@@ -44,6 +44,10 @@ class BroadbandView(ModuleView):
         self._ui_form.start_measurementButton.clicked.connect(lambda: self._start_measurement_clicked())
         self.start_measurement.connect(lambda: self.module._controller.start_measurement())
 
+        self._ui_form.averagesEdit.editingFinished.connect(lambda: self.on_editing_finished(self._ui_form.averagesEdit.text()))
+
+        self.module.controller.set_averages_failure.connect(self.on_set_averages_failure)
+
     def _start_measurement_clicked(self):
         # Create a QMessageBox object
         msg_box = QMessageBox()
@@ -94,3 +98,15 @@ class BroadbandView(ModuleView):
         self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=stop_frequency)
         self._ui_form.broadbandPlot.canvas.draw()
         self._ui_form.broadbandPlot.canvas.flush_events()
+
+    @pyqtSlot()
+    def on_editing_finished(self, value):
+        logger.debug("Averages editing finished.")
+        self.sender().setStyleSheet("")
+        if self.sender() == self._ui_form.averagesEdit:
+            self.module.controller.set_averages(value)
+
+    @pyqtSlot()
+    def on_set_averages_failure(self):
+        logger.debug("Set averages failure.")
+        self._ui_form.averagesEdit.setStyleSheet("border: 1px solid red;")
