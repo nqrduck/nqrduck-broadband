@@ -76,9 +76,9 @@
           </widget>
          </item>
          <item row="2" column="2">
-          <widget class="QLineEdit" name="frequency_stepField">
+          <widget class="QLineEdit" name="frequencystepEdit">
            <property name="text">
-            <string>0.1</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -91,7 +91,7 @@
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>50.0</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -108,7 +108,7 @@
          <item row="1" column="2">
           <widget class="QLineEdit" name="stop_frequencyField">
            <property name="text">
-            <string>70.0</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -132,7 +132,7 @@
          <item row="3" column="2">
           <widget class="QLineEdit" name="averagesEdit">
            <property name="text">
-            <string>1000</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
