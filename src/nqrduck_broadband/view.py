@@ -1,6 +1,6 @@
 import logging
 from PyQt6.QtCore import pyqtSlot, pyqtSignal
-from PyQt6.QtWidgets import QWidget, QMessageBox, QApplication
+from PyQt6.QtWidgets import QWidget, QMessageBox, QApplication, QLabel, QVBoxLayout
 
 from nqrduck.module.module_view import ModuleView
 from .widget import Ui_Form
@@ -25,6 +25,8 @@ class BroadbandView(ModuleView):
         self._connect_signals()
     
         self.init_plots()
+
+        self._ui_form.scrollAreaWidgetContents.setLayout(QVBoxLayout())
 
     def _connect_signals(self) -> None:
         self._ui_form.start_frequencyField.editingFinished.connect(
@@ -57,7 +59,7 @@ class BroadbandView(ModuleView):
 
     def _start_measurement_clicked(self):
         # Create a QMessageBox object
-        msg_box = QMessageBox()
+        msg_box = QMessageBox(parent=self)
         msg_box.setText("Start the measurement?")
         msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         
@@ -72,40 +74,50 @@ class BroadbandView(ModuleView):
             self.start_broadband_measurement.emit()
     
     def init_plots(self):
-
         # Initialization of broadband spectrum
-        self._ui_form.broadbandPlot.canvas.ax.set_title("Broadband Spectrum")
         self._ui_form.broadbandPlot.canvas.ax.set_xlim([0, 250])
-        self._ui_form.broadbandPlot.canvas.ax.set_xlabel("Frequency in MHz")
-        self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Amplitude a.u.")
-        self._ui_form.broadbandPlot.canvas.ax.grid()
+        self.set_broadband_labels()     
 
         # Initialization of last measurement time domain
-        self._ui_form.time_domainPlot.canvas.ax.set_title("Last Time Domain")
         self._ui_form.time_domainPlot.canvas.ax.set_xlim([0, 250])
+        self.set_timedomain_labels()
+
+
+        # Initialization of last measurement frequency domain
+        self._ui_form.frequency_domainPlot.canvas.ax.set_xlim([0, 250])
+        self.set_frequencydomain_labels()
+        
+
+    def set_timedomain_labels(self):
+        self._ui_form.time_domainPlot.canvas.ax.set_title("Last Time Domain")
         self._ui_form.time_domainPlot.canvas.ax.set_xlabel("time in us")
         self._ui_form.time_domainPlot.canvas.ax.set_ylabel("Amplitude a.u.")
         self._ui_form.time_domainPlot.canvas.ax.grid()
 
-        # Initialization of last measurement frequency domain
+    def set_frequencydomain_labels(self):
         self._ui_form.frequency_domainPlot.canvas.ax.set_title("Last Frequency Domain")
-        self._ui_form.frequency_domainPlot.canvas.ax.set_xlim([0, 250])
-        self._ui_form.frequency_domainPlot.canvas.ax.set_xlabel("time in us")
+        self._ui_form.frequency_domainPlot.canvas.ax.set_xlabel("Frequency in MHz")
         self._ui_form.frequency_domainPlot.canvas.ax.set_ylabel("Amplitude a.u.")
         self._ui_form.frequency_domainPlot.canvas.ax.grid()
 
+    def set_broadband_labels(self):
+        self._ui_form.broadbandPlot.canvas.ax.set_title("Broadband Spectrum")
+        self._ui_form.broadbandPlot.canvas.ax.set_xlabel("Frequency in MHz")
+        self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Amplitude a.u.")
+        self._ui_form.broadbandPlot.canvas.ax.grid()
+
     @pyqtSlot(float)
     def on_start_frequency_change(self, start_frequency):
-        logger.debug("Adjusting view to new start frequency: " + str(start_frequency))
-        self._ui_form.broadbandPlot.canvas.ax.set_xlim(left=start_frequency)
+        logger.debug("Adjusting view to new start frequency: " + str(start_frequency * 1e-6))
+        self._ui_form.broadbandPlot.canvas.ax.set_xlim(left=start_frequency*1e-6)
         self._ui_form.broadbandPlot.canvas.draw()
         self._ui_form.broadbandPlot.canvas.flush_events()
         self._ui_form.start_frequencyField.setText(str(start_frequency* 1e-6))
 
     @pyqtSlot(float)
     def on_stop_frequency_change(self, stop_frequency):
-        logger.debug("Adjusting view to new stop frequency: " + str(stop_frequency))
-        self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=stop_frequency)
+        logger.debug("Adjusting view to new stop frequency: " + str(stop_frequency * 1e-6))
+        self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=stop_frequency*1e-6)
         self._ui_form.broadbandPlot.canvas.draw()
         self._ui_form.broadbandPlot.canvas.flush_events()
         self._ui_form.stop_frequencyField.setText(str(stop_frequency* 1e-6))
@@ -135,15 +147,33 @@ class BroadbandView(ModuleView):
 
         td_plotter = self._ui_form.time_domainPlot.canvas.ax
         fd_plotter = self._ui_form.frequency_domainPlot.canvas.ax
+        broadband_plotter = self._ui_form.broadbandPlot.canvas.ax
 
         td_plotter.clear()
         fd_plotter.clear()
+        broadband_plotter.clear()
 
         td_plotter.plot(measurement.tdx, measurement.tdy)
-        fd_plotter.plot(measurement.fdx, measurement.fdy)
+        fd_plotter.plot(measurement.fdx * 1e-6, measurement.fdy * 1e-6)
+        broadband_plotter.plot(self.module.model.current_broadcast_measurement.broadband_data_fdx, self.module.model.current_broadcast_measurement.broadband_data_fdy)
+
+        self.set_timedomain_labels()
+        self.set_frequencydomain_labels()
+        self.set_broadband_labels()
 
         self._ui_form.time_domainPlot.canvas.draw()
         self._ui_form.frequency_domainPlot.canvas.draw()
+        self._ui_form.broadbandPlot.canvas.draw()
+
+        value = int(self.module.model.current_broadcast_measurement.get_finished_percentage())
+        logger.debug("Updating progress bar to: " + str(value))
+        self._ui_form.measurementProgress.setValue(value)
+        self._ui_form.measurementProgress.update()
 
         QApplication.processEvents()
+
+    def add_info_text(self, text):
+        text_label = QLabel(text)
+        text_label.setStyleSheet("font-size: 14px;")
+        self._ui_form.scrollAreaWidgetContents.layout().addWidget(text_label)
 

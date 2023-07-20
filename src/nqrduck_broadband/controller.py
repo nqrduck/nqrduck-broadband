@@ -81,13 +81,16 @@ class BroadbandController(ModuleController):
         logger.debug("Frequency list: " + str(frequency_list))
 
         # Create a new broadband measurement object
-        self.module.model.current_broadcast_measurement = self.module.model.BroadbandMeasurement(frequency_list)
+        self.module.model.current_broadcast_measurement = self.module.model.BroadbandMeasurement(frequency_list, self.module.model.frequency_step)
         self.module.model.current_broadcast_measurement.received_measurement.connect(self.module.view.on_broadband_measurement_added)
         self.module.model.current_broadcast_measurement.received_measurement.connect(self.on_broadband_measurement_added)
         
+        self.module.view.add_info_text("Starting broadband measurement.")
         # Start the first measurement
+        self.module.view.add_info_text("Starting measurement at frequency: " + str(start_frequency))
         self.module.nqrduck_signal.emit("set_frequency", str(start_frequency))
         self.module.nqrduck_signal.emit("start_measurement", None)
+
 
     @pyqtSlot()
     def on_broadband_measurement_added(self):
@@ -102,5 +105,8 @@ class BroadbandController(ModuleController):
             next_frequency = self.module.model.current_broadcast_measurement.get_next_measurement_frequency()
             logger.debug("Next frequency: " + str(next_frequency))
             # Start the next measurement
+            self.module.view.add_info_text("Starting measurement at frequency: " + str(next_frequency))
             self.module.nqrduck_signal.emit("set_frequency", str(next_frequency))
             self.module.nqrduck_signal.emit("start_measurement", None)
+        else:
+            self.module.view.add_info_text("Broadband measurement finished.")
