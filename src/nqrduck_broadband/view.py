@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
 from PyQt6.QtWidgets import QWidget, QMessageBox, QApplication, QLabel, QVBoxLayout
 
@@ -22,14 +23,16 @@ class BroadbandView(ModuleView):
 
         logger.debug("Facecolor %s" % str(self._ui_form.broadbandPlot.canvas.ax.get_facecolor()))
 
-        self._connect_signals()
+        self.connect_signals()
     
         self.init_plots()
 
         self._ui_form.scrollAreaWidgetContents.setLayout(QVBoxLayout())
         self._ui_form.scrollAreaWidgetContents.layout().setAlignment(Qt.AlignmentFlag.AlignTop)
 
-    def _connect_signals(self) -> None:
+    def connect_signals(self) -> None:
+        """Connect the signals of the view to the slots of the controller.
+        """
         self._ui_form.start_frequencyField.editingFinished.connect(
             lambda: self.module.controller.change_start_frequency(
                 self._ui_form.start_frequencyField.text()
@@ -50,7 +53,7 @@ class BroadbandView(ModuleView):
         self.module.model.start_frequency_changed.connect(self.on_start_frequency_change)
         self.module.model.stop_frequency_changed.connect(self.on_stop_frequency_change)
         
-        self._ui_form.start_measurementButton.clicked.connect(self._start_measurement_clicked)
+        self._ui_form.start_measurementButton.clicked.connect(self.start_measurement_clicked)
         self.start_broadband_measurement.connect(self.module._controller.start_broadband_measurement)
 
         self._ui_form.averagesEdit.editingFinished.connect(lambda: self.on_editing_finished(self._ui_form.averagesEdit.text()))
@@ -58,7 +61,13 @@ class BroadbandView(ModuleView):
         self.module.controller.set_averages_failure.connect(self.on_set_averages_failure)
         self.module.controller.set_frequency_step_failure.connect(self.on_set_frequency_step_failure)
 
-    def _start_measurement_clicked(self):
+    @pyqtSlot()
+    def start_measurement_clicked(self) -> None:
+        """This method is called when the start measurement button is clicked.
+        It shows a dialog asking the user if he really wants to start the measurement.
+        If the user clicks yes the start_broadband_measurement signal is emitted.
+        """
+
         # Create a QMessageBox object
         msg_box = QMessageBox(parent=self)
         msg_box.setText("Start the measurement?")
@@ -74,7 +83,9 @@ class BroadbandView(ModuleView):
         if choice == QMessageBox.StandardButton.Yes:
             self.start_broadband_measurement.emit()
     
-    def init_plots(self):
+    def init_plots(self) -> None:
+        """Initialize the plots.
+        """
         # Initialization of broadband spectrum
         self._ui_form.broadbandPlot.canvas.ax.set_xlim([0, 250])
         self.set_broadband_labels()     
@@ -89,26 +100,35 @@ class BroadbandView(ModuleView):
         self.set_frequencydomain_labels()
         
 
-    def set_timedomain_labels(self):
+    def set_timedomain_labels(self) -> None:
+        """Set the labels of the time domain plot.
+        """
         self._ui_form.time_domainPlot.canvas.ax.set_title("Last Time Domain")
         self._ui_form.time_domainPlot.canvas.ax.set_xlabel("time in us")
         self._ui_form.time_domainPlot.canvas.ax.set_ylabel("Amplitude a.u.")
         self._ui_form.time_domainPlot.canvas.ax.grid()
 
-    def set_frequencydomain_labels(self):
+    def set_frequencydomain_labels(self) -> None:
+        """Set the labels of the frequency domain plot.
+        """
         self._ui_form.frequency_domainPlot.canvas.ax.set_title("Last Frequency Domain")
         self._ui_form.frequency_domainPlot.canvas.ax.set_xlabel("Frequency in MHz")
         self._ui_form.frequency_domainPlot.canvas.ax.set_ylabel("Amplitude a.u.")
         self._ui_form.frequency_domainPlot.canvas.ax.grid()
 
-    def set_broadband_labels(self):
+    def set_broadband_labels(self) -> None:
+        """Set the labels of the broadband plot.
+        """
         self._ui_form.broadbandPlot.canvas.ax.set_title("Broadband Spectrum")
         self._ui_form.broadbandPlot.canvas.ax.set_xlabel("Frequency in MHz")
         self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Amplitude a.u.")
         self._ui_form.broadbandPlot.canvas.ax.grid()
 
     @pyqtSlot(float)
-    def on_start_frequency_change(self, start_frequency):
+    def on_start_frequency_change(self, start_frequency : float) -> None:
+        """This method is called when the start frequency is changed.
+        It adjusts the view to the new start frequency.
+        """
         logger.debug("Adjusting view to new start frequency: " + str(start_frequency * 1e-6))
         self._ui_form.broadbandPlot.canvas.ax.set_xlim(left=start_frequency*1e-6)
         self._ui_form.broadbandPlot.canvas.draw()
@@ -116,7 +136,10 @@ class BroadbandView(ModuleView):
         self._ui_form.start_frequencyField.setText(str(start_frequency* 1e-6))
 
     @pyqtSlot(float)
-    def on_stop_frequency_change(self, stop_frequency):
+    def on_stop_frequency_change(self, stop_frequency : float) -> None:
+        """This method is called when the stop frequency is changed.
+        It adjusts the view to the new stop frequency.
+        """
         logger.debug("Adjusting view to new stop frequency: " + str(stop_frequency * 1e-6))
         self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=stop_frequency*1e-6)
         self._ui_form.broadbandPlot.canvas.draw()
@@ -124,24 +147,36 @@ class BroadbandView(ModuleView):
         self._ui_form.stop_frequencyField.setText(str(stop_frequency* 1e-6))
 
     @pyqtSlot()
-    def on_editing_finished(self, value):
+    def on_editing_finished(self, value : str) -> None:
+        """This method is called when the user finished editing a field.
+        It sets the value of the field in the model.
+        """
         logger.debug("Editing finished by.")
         self.sender().setStyleSheet("")
         if self.sender() == self._ui_form.averagesEdit:
             self.module.controller.set_averages(value)
 
     @pyqtSlot()
-    def on_set_averages_failure(self):
+    def on_set_averages_failure(self) -> None:
+        """This method is called when the averages could not be set.
+        It sets the border of the averages field to red indicating that the entered value was not valid.
+        """
         logger.debug("Set averages failure.")
         self._ui_form.averagesEdit.setStyleSheet("border: 1px solid red;")
 
     @pyqtSlot()
-    def on_set_frequency_step_failure(self):
+    def on_set_frequency_step_failure(self) -> None:
+        """This method is called when the frequency step could not be set.
+        It sets the border of the frequency step field to red indicating that the entered value was not valid.
+        """
         logger.debug("Set frequency step failure.")
         self._ui_form.frequencystepEdit.setStyleSheet("border: 1px solid red;")
 
     @pyqtSlot()
-    def on_broadband_measurement_added(self):
+    def on_broadband_measurement_added(self) -> None:
+        """This method is called when a new broadband measurement is added to the model.
+        It updates the plots and the progress bar.
+        """
         # Get last measurement from the broadband measurement object that is not None
         logger.debug("Updating broadband plot.")
         measurement = self.module.model.current_broadcast_measurement.get_last_completed_measurement()
@@ -173,8 +208,15 @@ class BroadbandView(ModuleView):
 
         QApplication.processEvents()
 
-    def add_info_text(self, text):
+    def add_info_text(self, text : str) -> None:
+        """Add a text to the info box with a timestamp.
+        
+        Args:
+            text (str): The text to add to the info box.
+        """
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        text = "[%s] %s" % (timestamp, text)
         text_label = QLabel(text)
-        text_label.setStyleSheet("font-size: 20px;")
+        text_label.setStyleSheet("font-size: 25px;")
         self._ui_form.scrollAreaWidgetContents.layout().addWidget(text_label)
 
