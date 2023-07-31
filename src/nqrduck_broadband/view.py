@@ -1,5 +1,5 @@
 import logging
-from PyQt6.QtCore import pyqtSlot, pyqtSignal
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
 from PyQt6.QtWidgets import QWidget, QMessageBox, QApplication, QLabel, QVBoxLayout
 
 from nqrduck.module.module_view import ModuleView
@@ -27,6 +27,7 @@ class BroadbandView(ModuleView):
         self.init_plots()
 
         self._ui_form.scrollAreaWidgetContents.setLayout(QVBoxLayout())
+        self._ui_form.scrollAreaWidgetContents.layout().setAlignment(Qt.AlignmentFlag.AlignTop)
 
     def _connect_signals(self) -> None:
         self._ui_form.start_frequencyField.editingFinished.connect(
@@ -174,6 +175,6 @@ class BroadbandView(ModuleView):
 
     def add_info_text(self, text):
         text_label = QLabel(text)
-        text_label.setStyleSheet("font-size: 14px;")
+        text_label.setStyleSheet("font-size: 20px;")
         self._ui_form.scrollAreaWidgetContents.layout().addWidget(text_label)
 
