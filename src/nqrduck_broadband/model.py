@@ -20,7 +20,7 @@ class BroadbandModel(ModuleModel):
         self.start_frequency = self.MIN_FREQUENCY
         self.stop_frequency = self.MAX_FREQUENCY
         self.DEFAULT_FREQUENCY_STEP = self.DEFAULT_FREQUENCY_STEP
-        self.current_broadcast_measurement = None
+        self.current_broadband_measurement = None
 
     @property
     def start_frequency(self):
@@ -49,12 +49,12 @@ class BroadbandModel(ModuleModel):
         self._frequency_step = value
 
     @property
-    def current_broadcast_measurement(self):
-        return self._current_broadcast_measurement
+    def current_broadband_measurement(self):
+        return self._current_broadband_measurement
     
-    @current_broadcast_measurement.setter
-    def current_broadcast_measurement(self, value):
-        self._current_broadcast_measurement = value
+    @current_broadband_measurement.setter
+    def current_broadband_measurement(self, value):
+        self._current_broadband_measurement = value
 
     class BroadbandMeasurement(QObject):
         """This class represents a single broadband measurement."""
@@ -160,7 +160,7 @@ class BroadbandModel(ModuleModel):
                     # We append the frequency values of the current spectrum and shift them by the target frequency
                     fdx_assembled = np.append(fdx_assembled, -self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6)
                     fdx_assembled = np.append(fdx_assembled, measurement.fdx[idx_xf_lower + 1:idx_xf_upper - 1] + measurement.target_frequency * 1e-6)
-                    
+
                 # On the first run we will get an Index Error
                 except IndexError:
                     fdy_assembled = np.array([yf_interp_lower])

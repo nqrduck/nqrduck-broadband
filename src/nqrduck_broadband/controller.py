@@ -19,9 +19,9 @@ class BroadbandController(ModuleController):
 
     @pyqtSlot(str, object)
     def process_signals(self, key: str, value: Measurement):
-        if key == "measurement_data" and  self.module.model.current_broadcast_measurement is not None:
+        if key == "measurement_data" and  self.module.model.current_broadband_measurement is not None:
             logger.debug("Received single measurement.")
-            self.module.model.current_broadcast_measurement.add_measurement(value)
+            self.module.model.current_broadband_measurement.add_measurement(value)
 
         elif key == "failure_set_averages" and value == self.module.view._ui_form.averagesEdit.text():
             logger.debug("Received set averages failure.")
@@ -81,9 +81,9 @@ class BroadbandController(ModuleController):
         logger.debug("Frequency list: " + str(frequency_list))
 
         # Create a new broadband measurement object
-        self.module.model.current_broadcast_measurement = self.module.model.BroadbandMeasurement(frequency_list, self.module.model.frequency_step)
-        self.module.model.current_broadcast_measurement.received_measurement.connect(self.module.view.on_broadband_measurement_added)
-        self.module.model.current_broadcast_measurement.received_measurement.connect(self.on_broadband_measurement_added)
+        self.module.model.current_broadband_measurement = self.module.model.BroadbandMeasurement(frequency_list, self.module.model.frequency_step)
+        self.module.model.current_broadband_measurement.received_measurement.connect(self.module.view.on_broadband_measurement_added)
+        self.module.model.current_broadband_measurement.received_measurement.connect(self.on_broadband_measurement_added)
         
         self.module.view.add_info_text("Starting broadband measurement.")
         # Start the first measurement
@@ -100,9 +100,9 @@ class BroadbandController(ModuleController):
         """
         logger.debug("Broadband measurement added.")
         # Check if there are more frequencies to measure
-        if not self.module.model.current_broadcast_measurement.is_complete():
+        if not self.module.model.current_broadband_measurement.is_complete():
             # Get the next frequency to measure
-            next_frequency = self.module.model.current_broadcast_measurement.get_next_measurement_frequency()
+            next_frequency = self.module.model.current_broadband_measurement.get_next_measurement_frequency()
             logger.debug("Next frequency: " + str(next_frequency))
             # Start the next measurement
             self.module.view.add_info_text("Starting measurement at frequency: " + str(next_frequency))

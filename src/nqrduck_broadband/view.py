@@ -179,7 +179,7 @@ class BroadbandView(ModuleView):
         """
         # Get last measurement from the broadband measurement object that is not None
         logger.debug("Updating broadband plot.")
-        measurement = self.module.model.current_broadcast_measurement.get_last_completed_measurement()
+        measurement = self.module.model.current_broadband_measurement.get_last_completed_measurement()
 
         td_plotter = self._ui_form.time_domainPlot.canvas.ax
         fd_plotter = self._ui_form.frequency_domainPlot.canvas.ax
@@ -191,7 +191,7 @@ class BroadbandView(ModuleView):
 
         td_plotter.plot(measurement.tdx, measurement.tdy)
         fd_plotter.plot(measurement.fdx * 1e-6, measurement.fdy * 1e-6)
-        broadband_plotter.plot(self.module.model.current_broadcast_measurement.broadband_data_fdx, self.module.model.current_broadcast_measurement.broadband_data_fdy)
+        broadband_plotter.plot(self.module.model.current_broadband_measurement.broadband_data_fdx, self.module.model.current_broadband_measurement.broadband_data_fdy)
 
         self.set_timedomain_labels()
         self.set_frequencydomain_labels()
@@ -201,7 +201,7 @@ class BroadbandView(ModuleView):
         self._ui_form.frequency_domainPlot.canvas.draw()
         self._ui_form.broadbandPlot.canvas.draw()
 
-        value = int(self.module.model.current_broadcast_measurement.get_finished_percentage())
+        value = int(self.module.model.current_broadband_measurement.get_finished_percentage())
         logger.debug("Updating progress bar to: " + str(value))
         self._ui_form.measurementProgress.setValue(value)
         self._ui_form.measurementProgress.update()
