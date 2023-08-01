@@ -151,18 +151,27 @@ class BroadbandModel(ModuleModel):
                                         [measurement.fdy[center][0], measurement.fdy[idx_xf_lower][0]]) 
                 
                 try:
+                    # We take the last point of the previous spectrum and the first point of the current spectrum and average them
                     fdy_assembled[-1] = (fdy_assembled[-1] + yf_interp_lower) / 2
-                    fdy_assembled = np.append(fdy_assembled, measurement.fdy[center])
+                    # Then we append the data from idx_xf_lower + 1 (because of the averaged datapoint) to idx_xf_upper
+                    fdy_assembled = np.append(fdy_assembled, measurement.fdy[idx_xf_lower+1:idx_xf_upper-1])
                     fdy_assembled = np.append(fdy_assembled, yf_interp_upper)
                     
-                    fdx_assembled[-1] = -self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6
-                    fdx_assembled = np.append(fdx_assembled, measurement.target_frequency * 1e-6)
-                    fdx_assembled = np.append(fdx_assembled, +self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6)
+                    # We append the frequency values of the current spectrum and shift them by the target frequency
+                    fdx_assembled = np.append(fdx_assembled, -self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6)
+                    fdx_assembled = np.append(fdx_assembled, measurement.fdx[idx_xf_lower + 1:idx_xf_upper - 1] + measurement.target_frequency * 1e-6)
+                    
                 # On the first run we will get an Index Error
                 except IndexError:
-                    fdy_assembled = np.array([yf_interp_lower, measurement.fdy[center][0], yf_interp_upper])
-                    first_time_values = np.array([-self.frequency_step/2*1e-6, measurement.fdx[center] , +self.frequency_step/2*1e-6]) + measurement.target_frequency*1e-6
-                    fdx_assembled = first_time_values
+                    fdy_assembled = np.array([yf_interp_lower])
+                    fdy_assembled = np.append(fdy_assembled, measurement.fdy[idx_xf_lower+1:idx_xf_upper-1])
+                    fdy_assembled = np.append(fdy_assembled, yf_interp_upper)
+
+                    first_time_values = (measurement.fdx[idx_xf_lower:idx_xf_upper] + measurement.target_frequency * 1e-6)
+                    first_time_values[0] =  -self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6
+                    first_time_values[-1] = +self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6
+                    
+                    fdx_assembled = np.array(first_time_values)
             
             self.broadband_data_fdx = fdx_assembled.flatten()
             self.broadband_data_fdy = fdy_assembled.flatten()
