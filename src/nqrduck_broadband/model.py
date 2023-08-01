@@ -105,7 +105,7 @@ class BroadbandModel(ModuleModel):
             Returns:
                 Measurement: The last completed measurement."""
             
-            for frequency, measurement in self._single_frequency_measurements.items():
+            for frequency, measurement in reversed(self._single_frequency_measurements.items()):
                 if measurement is not None:
                     return measurement
                 
