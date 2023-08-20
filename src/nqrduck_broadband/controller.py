@@ -18,7 +18,13 @@ class BroadbandController(ModuleController):
         
 
     @pyqtSlot(str, object)
-    def process_signals(self, key: str, value: Measurement):
+    def process_signals(self, key: str, value: object) -> None:
+        """Process incoming signal from the nqrduck module.
+        
+        Args:
+            key (str): Name of the signal.
+            value (object): Value of the signal.
+        """
         if key == "measurement_data" and  self.module.model.current_broadband_measurement is not None:
             logger.debug("Received single measurement.")
             self.module.model.current_broadband_measurement.add_measurement(value)
@@ -29,7 +35,12 @@ class BroadbandController(ModuleController):
 
         
     @pyqtSlot(str)
-    def set_frequency(self, value):
+    def set_frequency(self, value : str) -> None:
+        """ Emits the set frequency signal to the nqrduck module.
+        
+        Args:
+            value (str): Frequency in MHz.
+        """
         try:
             logger.debug("Setting frequency to: " + float(value))
             self.module.nqrduck_signal.emit("set_frequency", value)
@@ -38,12 +49,18 @@ class BroadbandController(ModuleController):
             self.set_frequency_step_failure.emit()
 
     @pyqtSlot(str)
-    def set_averages(self, value):
+    def set_averages(self, value : str) -> None:
+        """Emits the set averages signal to the nqrduck module.
+        
+        Args:
+            value (str): Number of averages.
+        """
         logger.debug("Setting averages to: " + value)
         self.module.nqrduck_signal.emit("set_averages", value)
 
     @pyqtSlot(str)
-    def change_start_frequency(self, value):
+    def change_start_frequency(self, value : str) -> None:
+        """Changes the start frequency of the measurement."""
         value = float(value)
         if value > self.module.model.MIN_FREQUENCY:
             self.module.model.start_frequency = value * 1e6
@@ -51,7 +68,8 @@ class BroadbandController(ModuleController):
             self.module.model.start_frequency = self.module.model.MIN_FREQUENCY
 
     @pyqtSlot(str)
-    def change_stop_frequency(self, value):
+    def change_stop_frequency(self, value:str) -> None:
+        """Changes the stop frequency of the measurement."""
         value = float(value)
         if value < self.module.model.MAX_FREQUENCY:
             self.module._model.stop_frequency = value * 1e6
@@ -59,7 +77,8 @@ class BroadbandController(ModuleController):
             self.module._model.stop_frequency = self.module.model.MAX_FREQUENCY
 
     @pyqtSlot(str)
-    def change_frequency_step(self, value):
+    def change_frequency_step(self, value :str) -> None:
+        """Changes the frequency step of the measurement."""
         try:
             logger.debug("Changing frequency step to: " + value)
             value = float(value) * 1e6
@@ -70,7 +89,8 @@ class BroadbandController(ModuleController):
 
 
     @pyqtSlot()
-    def start_broadband_measurement(self):
+    def start_broadband_measurement(self) -> None:
+        """Starts a broadband measurement."""
         logger.debug("Start measurement clicked")
         # Create a list of different frequency values that we need for our broadband measurement
         start_frequency = self.module.model.start_frequency
@@ -93,7 +113,7 @@ class BroadbandController(ModuleController):
 
 
     @pyqtSlot()
-    def on_broadband_measurement_added(self):
+    def on_broadband_measurement_added(self) -> None:
         """This slot is called when a single measurement is added to the broadband measurement.
         It then checks if there are more frequencies to measure and if so, starts the next measurement.
         Furthermore it updates the plots.

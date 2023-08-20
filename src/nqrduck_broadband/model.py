@@ -69,7 +69,7 @@ class BroadbandModel(ModuleModel):
 
             self.frequency_step = frequency_step
 
-        def add_measurement(self, measurement):
+        def add_measurement(self, measurement : "Measurement") -> None:
             """This method adds a single measurement to the broadband measurement.
             
             Args:
@@ -80,7 +80,7 @@ class BroadbandModel(ModuleModel):
             self.received_measurement.emit()
             QApplication.processEvents()
 
-        def is_complete(self):
+        def is_complete(self) -> bool:
             """This method checks if all frequencies have been measured.
             
             Returns:
@@ -90,7 +90,7 @@ class BroadbandModel(ModuleModel):
                     return False
             return True
         
-        def get_next_measurement_frequency(self):
+        def get_next_measurement_frequency(self) -> float:
             """This method returns the next frequency that has to be measured.
             
             Returns:
@@ -99,7 +99,7 @@ class BroadbandModel(ModuleModel):
                 if measurement is None:
                     return frequency
                 
-        def get_last_completed_measurement(self):
+        def get_last_completed_measurement(self) -> "Measurement":
             """ This method returns the last completed measurement.
             
             Returns:
@@ -109,7 +109,7 @@ class BroadbandModel(ModuleModel):
                 if measurement is not None:
                     return measurement
                 
-        def get_finished_percentage(self):
+        def get_finished_percentage(self) -> float:
             """Get the percentage of measurements that have been finished.
             
             Returns:
@@ -121,7 +121,7 @@ class BroadbandModel(ModuleModel):
                     finished_measurements += 1
             return finished_measurements / len(self._single_frequency_measurements) * 100
         
-        def assemble_broadband_spectrum(self):
+        def assemble_broadband_spectrum(self) -> None:
             """This method assembles the broadband spectrum from the single frequency measurement data in frequency domain."""
             # First we get all of the single frequency measurements that have already been measured
             single_frequency_measurements = []
@@ -177,13 +177,13 @@ class BroadbandModel(ModuleModel):
             self.broadband_data_fdy = fdy_assembled.flatten()
                 
 
-        def find_nearest(self, array, value):
+        def find_nearest(self, array, value) -> int:
             array = np.asarray(array)
             idx = (np.abs(array - value)).argmin()
             return idx
 
         @property
-        def single_frequency_measurements(self):
+        def single_frequency_measurements(self) -> dict:
             """This property contains the dict of all frequencies that have to be measured."""
             return self._single_frequency_measurements
         
