@@ -65,6 +65,9 @@ class BroadbandView(ModuleView):
         # LUT data
         self.module.model.LUT_changed.connect(self.on_LUT_changed)
 
+        # On deleteLUTButton clicked
+        self._ui_form.deleteLUTButton.clicked.connect(self.module.controller.delete_LUT)
+
     @pyqtSlot()
     def start_measurement_clicked(self) -> None:
         """This method is called when the start measurement button is clicked.
@@ -229,7 +232,17 @@ class BroadbandView(ModuleView):
     def on_LUT_changed(self) -> None:
         """This method is called when the LUT data is changed."""
         logger.debug("Updating LUT fields.")
-        # LUT type here
+        # If lut is not None disable the start- stop step frequency fields and update the LUT type label
+        if self.module.model.LUT is not None:
+            self._ui_form.start_frequencyField.setEnabled(False)
+            self._ui_form.stop_frequencyField.setEnabled(False)
+            self._ui_form.frequencystepEdit.setEnabled(False)
+            self._ui_form.activeLUTLabel.setText("Test")
+        else:
+            self._ui_form.start_frequencyField.setEnabled(True)
+            self._ui_form.stop_frequencyField.setEnabled(True)
+            self._ui_form.frequencystepEdit.setEnabled(True)
+            self._ui_form.activeLUTLabel.setText("None")
 
     def add_info_text(self, text : str) -> None:
         """Add a text to the info box with a timestamp.

@@ -34,11 +34,19 @@ class BroadbandController(ModuleController):
             self.set_averages_failure.emit()
         # receive LUT data
         elif key  == "LUT_finished":
-            logger.debug("Received LUT data.")
-            self.module.model.LUT = value
-            self.change_start_frequency(self.module.model.LUT.start_frequency)
-            self.change_stop_frequency(self.module.model.LUT.stop_frequency)
-            self.change_frequency_step(self.module.model.LUT.frequency_step)
+            self.received_LUT(value)
+
+    def received_LUT(self, LUT : Measurement) -> None:
+        """This slot is called when the LUT data is received from the nqrduck module.
+        
+        Args:
+            LUT (Measurement): LUT data.
+        """
+        logger.debug("Received LUT data.")
+        self.module.model.LUT = LUT
+        self.change_start_frequency(self.module.model.LUT.start_frequency)
+        self.change_stop_frequency(self.module.model.LUT.stop_frequency)
+        self.change_frequency_step(self.module.model.LUT.frequency_step)
         
     @pyqtSlot(str)
     def set_frequency(self, value : str) -> None:
@@ -131,6 +139,11 @@ class BroadbandController(ModuleController):
         else:
             self.module.view.add_info_text("Broadband measurement finished.")
 
+    @pyqtSlot()
+    def delete_LUT(self) -> None:
+        """This slot is called when the LUT is deleted."""
+        self.module.model.LUT = None
+
     def start_single_measurement(self, frequency : float) -> None:
         """Starts a single measurement.
         
@@ -139,5 +152,8 @@ class BroadbandController(ModuleController):
         """
         logger.debug("Starting single measurement.")
         self.module.view.add_info_text("Starting measurement at frequency: " + str(frequency))
+        # First set the frequency of the spectrometer
         self.module.nqrduck_signal.emit("set_frequency", str(frequency))
+        # If there is a LUT available, send the tune and match values as signal
+
         self.module.nqrduck_signal.emit("start_measurement", None)
