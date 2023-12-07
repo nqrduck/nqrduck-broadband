@@ -14,6 +14,7 @@ class BroadbandModel(ModuleModel):
 
     start_frequency_changed = pyqtSignal(float)
     stop_frequency_changed = pyqtSignal(float)
+    frequency_step_changed = pyqtSignal(float)
     LUT_changed = pyqtSignal()
 
     def __init__(self, module) -> None:
@@ -48,6 +49,7 @@ class BroadbandModel(ModuleModel):
     @frequency_step.setter
     def frequency_step(self, value):
         self._frequency_step = value
+        self.frequency_step_changed.emit(value)
 
     @property
     def current_broadband_measurement(self):

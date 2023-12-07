@@ -52,6 +52,7 @@ class BroadbandView(ModuleView):
 
         self.module.model.start_frequency_changed.connect(self.on_start_frequency_change)
         self.module.model.stop_frequency_changed.connect(self.on_stop_frequency_change)
+        self.module.model.frequency_step_changed.connect(self.on_frequency_step_change)
         
         self._ui_form.start_measurementButton.clicked.connect(self.start_measurement_clicked)
         self.start_broadband_measurement.connect(self.module._controller.start_broadband_measurement)
@@ -148,6 +149,19 @@ class BroadbandView(ModuleView):
         self._ui_form.broadbandPlot.canvas.draw()
         self._ui_form.broadbandPlot.canvas.flush_events()
         self._ui_form.stop_frequencyField.setText(str(stop_frequency* 1e-6))
+
+    @pyqtSlot(float)
+    def on_frequency_step_change(self, frequency_step : float) -> None:
+        """This method is called when the frequency step is changed.
+        It adjusts the view to the new frequency step.
+        """
+        logger.debug("Adjusting view to new frequency step: " + str(frequency_step * 1e-6))
+        self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=frequency_step*1e-6)
+        self._ui_form.broadbandPlot.canvas.draw()
+        self._ui_form.broadbandPlot.canvas.flush_events()
+        # Fix float representation
+        frequency_step = str("{:.2f}".format(frequency_step * 1e-6))
+        self._ui_form.frequencystepEdit.setText(frequency_step)
 
     @pyqtSlot()
     def on_editing_finished(self, value : str) -> None:

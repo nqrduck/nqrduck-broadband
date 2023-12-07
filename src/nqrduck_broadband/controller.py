@@ -112,9 +112,7 @@ class BroadbandController(ModuleController):
         
         self.module.view.add_info_text("Starting broadband measurement.")
         # Start the first measurement
-        self.module.view.add_info_text("Starting measurement at frequency: " + str(start_frequency))
-        self.module.nqrduck_signal.emit("set_frequency", str(start_frequency))
-        self.module.nqrduck_signal.emit("start_measurement", None)
+        self.start_single_measurement(start_frequency)
 
 
     @pyqtSlot()
@@ -129,9 +127,17 @@ class BroadbandController(ModuleController):
             # Get the next frequency to measure
             next_frequency = self.module.model.current_broadband_measurement.get_next_measurement_frequency()
             logger.debug("Next frequency: " + str(next_frequency))
-            # Start the next measurement
-            self.module.view.add_info_text("Starting measurement at frequency: " + str(next_frequency))
-            self.module.nqrduck_signal.emit("set_frequency", str(next_frequency))
-            self.module.nqrduck_signal.emit("start_measurement", None)
+            self.start_single_measurement(next_frequency)
         else:
             self.module.view.add_info_text("Broadband measurement finished.")
+
+    def start_single_measurement(self, frequency : float) -> None:
+        """Starts a single measurement.
+        
+        Args:
+            frequency (float): Frequency in MHz.
+        """
+        logger.debug("Starting single measurement.")
+        self.module.view.add_info_text("Starting measurement at frequency: " + str(frequency))
+        self.module.nqrduck_signal.emit("set_frequency", str(frequency))
+        self.module.nqrduck_signal.emit("start_measurement", None)
