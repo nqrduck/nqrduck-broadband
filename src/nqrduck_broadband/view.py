@@ -61,13 +61,6 @@ class BroadbandView(ModuleView):
         self._ui_form.start_measurementButton.clicked.connect(self.start_measurement_clicked)
         self.start_broadband_measurement.connect(self.module._controller.start_broadband_measurement)
 
-        self._ui_form.start_measurementButton.clicked.connect(
-            self.start_measurement_clicked
-        )
-        self.start_broadband_measurement.connect(
-            self.module._controller.start_broadband_measurement
-        )
-
         self._ui_form.averagesEdit.editingFinished.connect(
             lambda: self.on_editing_finished(self._ui_form.averagesEdit.text())
         )
