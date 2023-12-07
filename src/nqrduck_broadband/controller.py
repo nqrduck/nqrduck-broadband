@@ -32,7 +32,13 @@ class BroadbandController(ModuleController):
         elif key == "failure_set_averages" and value == self.module.view._ui_form.averagesEdit.text():
             logger.debug("Received set averages failure.")
             self.set_averages_failure.emit()
-
+        # receive LUT data
+        elif key  == "LUT_finished":
+            logger.debug("Received LUT data.")
+            self.module.model.LUT = value
+            self.change_start_frequency(self.module.model.LUT.start_frequency)
+            self.change_stop_frequency(self.module.model.LUT.stop_frequency)
+            self.change_frequency_step(self.module.model.LUT.frequency_step)
         
     @pyqtSlot(str)
     def set_frequency(self, value : str) -> None:
@@ -80,7 +86,6 @@ class BroadbandController(ModuleController):
     def change_frequency_step(self, value :str) -> None:
         """Changes the frequency step of the measurement."""
         try:
-            logger.debug("Changing frequency step to: " + value)
             value = float(value) * 1e6
             if value > 0:
                 self.module.model.frequency_step = value

@@ -14,6 +14,7 @@ class BroadbandModel(ModuleModel):
 
     start_frequency_changed = pyqtSignal(float)
     stop_frequency_changed = pyqtSignal(float)
+    LUT_changed = pyqtSignal()
 
     def __init__(self, module) -> None:
         super().__init__(module)
@@ -55,6 +56,15 @@ class BroadbandModel(ModuleModel):
     @current_broadband_measurement.setter
     def current_broadband_measurement(self, value):
         self._current_broadband_measurement = value
+
+    @property
+    def LUT(self):
+        return self._LUT
+    
+    @LUT.setter
+    def LUT(self, value):
+        self._LUT = value
+        self.LUT_changed.emit()
 
     class BroadbandMeasurement(QObject):
         """This class represents a single broadband measurement."""

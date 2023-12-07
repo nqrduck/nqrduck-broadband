@@ -61,6 +61,9 @@ class BroadbandView(ModuleView):
         self.module.controller.set_averages_failure.connect(self.on_set_averages_failure)
         self.module.controller.set_frequency_step_failure.connect(self.on_set_frequency_step_failure)
 
+        # LUT data
+        self.module.model.LUT_changed.connect(self.on_LUT_changed)
+
     @pyqtSlot()
     def start_measurement_clicked(self) -> None:
         """This method is called when the start measurement button is clicked.
@@ -207,6 +210,12 @@ class BroadbandView(ModuleView):
         self._ui_form.measurementProgress.update()
 
         QApplication.processEvents()
+
+    @pyqtSlot()
+    def on_LUT_changed(self) -> None:
+        """This method is called when the LUT data is changed."""
+        logger.debug("Updating LUT fields.")
+        # LUT type here
 
     def add_info_text(self, text : str) -> None:
         """Add a text to the info box with a timestamp.
