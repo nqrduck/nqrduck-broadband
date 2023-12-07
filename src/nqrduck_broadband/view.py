@@ -237,7 +237,7 @@ class BroadbandView(ModuleView):
             self._ui_form.start_frequencyField.setEnabled(False)
             self._ui_form.stop_frequencyField.setEnabled(False)
             self._ui_form.frequencystepEdit.setEnabled(False)
-            self._ui_form.activeLUTLabel.setText("Test")
+            self._ui_form.activeLUTLabel.setText(self.module.model.LUT.TYPE)
         else:
             self._ui_form.start_frequencyField.setEnabled(True)
             self._ui_form.stop_frequencyField.setEnabled(True)

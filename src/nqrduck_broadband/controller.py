@@ -25,6 +25,8 @@ class BroadbandController(ModuleController):
             key (str): Name of the signal.
             value (object): Value of the signal.
         """
+        logger.debug(self.module.model.waiting_for_tune_and_match)
+
         if key == "measurement_data" and  self.module.model.current_broadband_measurement is not None:
             logger.debug("Received single measurement.")
             self.module.model.current_broadband_measurement.add_measurement(value)
@@ -35,6 +37,11 @@ class BroadbandController(ModuleController):
         # receive LUT data
         elif key  == "LUT_finished":
             self.received_LUT(value)
+
+        elif key == "confirm_tune_and_match" and self.module.model.waiting_for_tune_and_match:
+            logger.debug("Confirmed tune and match.")
+            self.module.nqrduck_signal.emit("start_measurement", None)
+            self.module.model.waiting_for_tune_and_match = False
 
     def received_LUT(self, LUT : Measurement) -> None:
         """This slot is called when the LUT data is received from the nqrduck module.
@@ -155,5 +162,12 @@ class BroadbandController(ModuleController):
         # First set the frequency of the spectrometer
         self.module.nqrduck_signal.emit("set_frequency", str(frequency))
         # If there is a LUT available, send the tune and match values as signal
-
-        self.module.nqrduck_signal.emit("start_measurement", None)
+        if self.module.model.LUT is not None:
+            self.module.model.waiting_for_tune_and_match = True
+            # We need the entry number of the LUT for the current frequency
+            
+            self.module.nqrduck_signal.emit("set_tune_and_match", frequency * 1e-6)
+            QApplication.processEvents()
+        else:
+            self.module.nqrduck_signal.emit("start_measurement", None)
+            self.module.model.waiting_for_tune_and_match = False

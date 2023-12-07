@@ -23,6 +23,7 @@ class BroadbandModel(ModuleModel):
         self.stop_frequency = self.MAX_FREQUENCY
         self.DEFAULT_FREQUENCY_STEP = self.DEFAULT_FREQUENCY_STEP
         self.current_broadband_measurement = None
+        self.waiting_for_tune_and_match = False
 
     @property
     def start_frequency(self):
