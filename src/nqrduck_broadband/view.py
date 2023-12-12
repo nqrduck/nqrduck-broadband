@@ -132,10 +132,15 @@ class BroadbandView(ModuleView):
 
     def set_broadband_labels(self) -> None:
         """Set the labels of the broadband plot."""
-        self._ui_form.broadbandPlot.canvas.ax.set_title("Broadband Spectrum")
+        self._ui_form.broadbandPlot.canvas.ax.set_title("Magnitude Plot")
         self._ui_form.broadbandPlot.canvas.ax.set_xlabel("Frequency in MHz")
-        self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Amplitude a.u.")
+        self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Magnitude a.u.")
         self._ui_form.broadbandPlot.canvas.ax.grid()
+
+        # Make second axis for S11 value
+        self._ui_form.broadbandPlot.canvas.ax2 = self._ui_form.broadbandPlot.canvas.ax.twinx()
+        self._ui_form.broadbandPlot.canvas.ax2.set_ylabel("S11 in dB")
+        self._ui_form.broadbandPlot.canvas.ax2.set_ylim([-40, 0])
 
     @pyqtSlot(float)
     def on_start_frequency_change(self, start_frequency: float) -> None:
@@ -221,12 +226,28 @@ class BroadbandView(ModuleView):
         fd_plotter.clear()
         broadband_plotter.clear()
 
-        td_plotter.plot(measurement.tdx, measurement.tdy)
-        fd_plotter.plot(measurement.fdx * 1e-6, measurement.fdy * 1e-6)
+        td_plotter.plot(measurement.tdx, measurement.tdy.real, label="Real", linestyle="-", alpha=0.35, color="red")
+        td_plotter.plot(measurement.tdx, measurement.tdy.imag, label="Imaginary", linestyle="-", alpha=0.35, color="green")
+        td_plotter.plot(measurement.tdx, abs(measurement.tdy), label="Magnitude", color="blue")
+        td_plotter.legend()
+
+        fd_plotter.plot(measurement.fdx * 1e-6, measurement.fdy.real, label="Real", linestyle="-", alpha=0.35, color="red")
+        fd_plotter.plot(measurement.fdx * 1e-6, measurement.fdy.imag, label="Imaginary", linestyle="-", alpha=0.35, color="green")
+        fd_plotter.plot(measurement.fdx * 1e-6, abs(measurement.fdy), label="Magnitude", color="blue")
+        fd_plotter.legend()
+
+        # Plot real and imag part again here in time and frequency domain
         broadband_plotter.plot(
             self.module.model.current_broadband_measurement.broadband_data_fdx,
             self.module.model.current_broadband_measurement.broadband_data_fdy,
         )
+
+        # Plot S11 values on the twin axis of the broadband plot
+        frequencies  = self.module.model.current_broadband_measurement.reflection.keys()
+        frequencies = [frequency * 1e-6 for frequency in frequencies]
+        reflection_values = self.module.model.current_broadband_measurement.reflection.values()
+        S11plotter = self._ui_form.broadbandPlot.canvas.ax2
+        S11plotter.plot(frequencies, reflection_values, color="red", marker="x", linestyle="None")
 
         self.set_timedomain_labels()
         self.set_frequencydomain_labels()

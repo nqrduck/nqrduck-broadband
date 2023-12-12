@@ -42,6 +42,10 @@ class BroadbandController(ModuleController):
 
         elif key == "confirm_tune_and_match" and self.module.model.waiting_for_tune_and_match:
             logger.debug("Confirmed tune and match.")
+            reflection = value
+            logger.debug("Reflection: " + str(reflection))
+            if reflection is not None:
+                self.module.model.current_broadband_measurement.add_tune_and_match(reflection)
             self.module.nqrduck_signal.emit("start_measurement", None)
             self.module.model.waiting_for_tune_and_match = False
 

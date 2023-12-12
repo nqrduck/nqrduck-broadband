@@ -81,6 +81,7 @@ class BroadbandModel(ModuleModel):
                 self._single_frequency_measurements[frequency] = None
 
             self.frequency_step = frequency_step
+            self.reflection = {}
 
         def add_measurement(self, measurement : "Measurement") -> None:
             """This method adds a single measurement to the broadband measurement.
@@ -188,7 +189,16 @@ class BroadbandModel(ModuleModel):
             
             self.broadband_data_fdx = fdx_assembled.flatten()
             self.broadband_data_fdy = fdy_assembled.flatten()
-                
+        
+        def add_tune_and_match(self, magnitude) -> None:
+            """This method adds the tune and match values to the last completed measurement.
+            
+            Args:
+                magnitude (float): The magnitude of the tune and match values."""
+            logger.debug("Adding tune and match values toat next measurement frequency")
+            next_measurement_frequency = self.get_next_measurement_frequency()
+            self.reflection[next_measurement_frequency] = magnitude
+
 
         def find_nearest(self, array, value) -> int:
             array = np.asarray(array)
