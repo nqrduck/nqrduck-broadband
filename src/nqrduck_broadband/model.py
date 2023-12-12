@@ -24,6 +24,7 @@ class BroadbandModel(ModuleModel):
         self.DEFAULT_FREQUENCY_STEP = self.DEFAULT_FREQUENCY_STEP
         self.current_broadband_measurement = None
         self.waiting_for_tune_and_match = False
+        self.LUT = None
 
     @property
     def start_frequency(self):
@@ -146,10 +147,18 @@ class BroadbandModel(ModuleModel):
             logger.debug("Assembling broadband spectrum from %d single frequency measurements." % len(single_frequency_measurements))
             fdy_assembled = np.array([])
             fdx_assembled = np.array([])
-            # We cut out step_size / 2 around 0 Hz of the spectrum and assemble the broadband spectrum
+            # We cut out step_size / 2 around the IF of the spectrum and assemble the broadband spectrum
             for measurement in single_frequency_measurements:
-                # This finds the center of the spectrum
-                center = np.where(measurement.fdx == 0)[0][0]
+                # This finds the center of the spectrum if the IF is not 0 it will cut out step_size / 2 around the IF
+                logger.debug("IF frequency: %f" % measurement.IF_frequency)
+                logger.debug(measurement.fdx)
+                offset = measurement.IF_frequency * 1e-6
+                logger.debug("Offset: %f" % offset)
+
+                #center = np.where(measurement.fdx == offset)[0][0]
+                # Find closest to offset
+                center = self.find_nearest(measurement.fdx, offset)
+                
                 logger.debug("Center: %d" % center)
                 # This finds the nearest index of the lower and upper frequency step
                 logger.debug("Frequency step: %f" % self.frequency_step)
@@ -159,16 +168,16 @@ class BroadbandModel(ModuleModel):
 
                 # This interpolates the y values of the lower and upper frequency step
                 yf_interp_lower = np.interp(-self.frequency_step/2 * 1e-6, [measurement.fdx[idx_xf_lower], measurement.fdx[center]], 
-                                        [measurement.fdy[idx_xf_lower][0], measurement.fdy[center][0]])
+                                        [abs(measurement.fdy)[idx_xf_lower][0], abs(measurement.fdy)[center][0]])
             
                 yf_interp_upper = np.interp(+self.frequency_step/2 * 1e-6, [measurement.fdx[center], measurement.fdx[idx_xf_upper]], 
-                                        [measurement.fdy[center][0], measurement.fdy[idx_xf_lower][0]]) 
+                                        [abs(measurement.fdy)[center][0], abs(measurement.fdy)[idx_xf_lower][0]]) 
                 
                 try:
                     # We take the last point of the previous spectrum and the first point of the current spectrum and average them
                     fdy_assembled[-1] = (fdy_assembled[-1] + yf_interp_lower) / 2
                     # Then we append the data from idx_xf_lower + 1 (because of the averaged datapoint) to idx_xf_upper
-                    fdy_assembled = np.append(fdy_assembled, measurement.fdy[idx_xf_lower+1:idx_xf_upper-1])
+                    fdy_assembled = np.append(fdy_assembled, abs(measurement.fdy)[idx_xf_lower+1:idx_xf_upper-1])
                     fdy_assembled = np.append(fdy_assembled, yf_interp_upper)
                     
                     # We append the frequency values of the current spectrum and shift them by the target frequency
@@ -178,7 +187,7 @@ class BroadbandModel(ModuleModel):
                 # On the first run we will get an Index Error
                 except IndexError:
                     fdy_assembled = np.array([yf_interp_lower])
-                    fdy_assembled = np.append(fdy_assembled, measurement.fdy[idx_xf_lower+1:idx_xf_upper-1])
+                    fdy_assembled = np.append(fdy_assembled, abs(measurement.fdy)[idx_xf_lower+1:idx_xf_upper-1])
                     fdy_assembled = np.append(fdy_assembled, yf_interp_upper)
 
                     first_time_values = (measurement.fdx[idx_xf_lower:idx_xf_upper] + measurement.target_frequency * 1e-6)
