@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from PyQt6.QtCore import pyqtSlot, pyqtSignal, QThread
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, QTimer
 from PyQt6.QtWidgets import QApplication
 from nqrduck_spectrometer.measurement import Measurement
 from nqrduck.module.module_controller import ModuleController
@@ -142,7 +142,8 @@ class BroadbandController(ModuleController):
 
         self.module.view.add_info_text("Starting broadband measurement.")
         # Start the first measurement
-        self.start_single_measurement(start_frequency)
+        QTimer.singleShot(500, lambda: self.start_single_measurement(start_frequency))
+        QApplication.processEvents()
 
     @pyqtSlot()
     def on_broadband_measurement_added(self) -> None:
@@ -158,7 +159,8 @@ class BroadbandController(ModuleController):
                 self.module.model.current_broadband_measurement.get_next_measurement_frequency()
             )
             logger.debug("Next frequency: " + str(next_frequency))
-            self.start_single_measurement(next_frequency)
+            QTimer.singleShot(500, lambda: self.start_single_measurement(next_frequency))
+            QApplication.processEvents()
         else:
             self.module.view.add_info_text("Broadband measurement finished.")
 
@@ -177,6 +179,7 @@ class BroadbandController(ModuleController):
         self.module.view.add_info_text("Starting measurement at frequency: " + str(frequency))
         # First set the frequency of the spectrometer
         self.module.nqrduck_signal.emit("set_frequency", str(frequency))
+        QApplication.processEvents()
         # If there is a LUT available, send the tune and match values as signal
         if self.module.model.LUT is not None:
             self.module.model.waiting_for_tune_and_match = True
@@ -187,3 +190,4 @@ class BroadbandController(ModuleController):
         else:
             self.module.nqrduck_signal.emit("start_measurement", None)
             self.module.model.waiting_for_tune_and_match = False
+            QApplication.processEvents()
