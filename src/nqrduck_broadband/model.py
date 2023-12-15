@@ -163,14 +163,14 @@ class BroadbandModel(ModuleModel):
                 # This finds the nearest index of the lower and upper frequency step
                 logger.debug("Frequency step: %f" % self.frequency_step)
                 logger.debug(measurement.fdx)
-                idx_xf_lower = self.find_nearest(measurement.fdx, -self.frequency_step/2 * 1e-6) 
-                idx_xf_upper = self.find_nearest(measurement.fdx, +self.frequency_step/2 * 1e-6)
+                idx_xf_lower = self.find_nearest(measurement.fdx, offset - ((self.frequency_step/2) * 1e-6)) 
+                idx_xf_upper = self.find_nearest(measurement.fdx, offset + ((self.frequency_step/2) * 1e-6))
 
                 # This interpolates the y values of the lower and upper frequency step
-                yf_interp_lower = np.interp(-self.frequency_step/2 * 1e-6, [measurement.fdx[idx_xf_lower], measurement.fdx[center]], 
+                yf_interp_lower = np.interp(offset-self.frequency_step/2 * 1e-6, [measurement.fdx[idx_xf_lower], measurement.fdx[center]], 
                                         [abs(measurement.fdy)[idx_xf_lower][0], abs(measurement.fdy)[center][0]])
             
-                yf_interp_upper = np.interp(+self.frequency_step/2 * 1e-6, [measurement.fdx[center], measurement.fdx[idx_xf_upper]], 
+                yf_interp_upper = np.interp(offset+self.frequency_step/2 * 1e-6, [measurement.fdx[center], measurement.fdx[idx_xf_upper]], 
                                         [abs(measurement.fdy)[center][0], abs(measurement.fdy)[idx_xf_lower][0]]) 
                 
                 try:
@@ -182,7 +182,7 @@ class BroadbandModel(ModuleModel):
                     
                     # We append the frequency values of the current spectrum and shift them by the target frequency
                     fdx_assembled = np.append(fdx_assembled, -self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6)
-                    fdx_assembled = np.append(fdx_assembled, measurement.fdx[idx_xf_lower + 1:idx_xf_upper - 1] + measurement.target_frequency * 1e-6)
+                    fdx_assembled = np.append(fdx_assembled, measurement.fdx[idx_xf_lower + 1:idx_xf_upper - 1] + measurement.target_frequency * 1e-6 - offset)
 
                 # On the first run we will get an Index Error
                 except IndexError:
@@ -190,7 +190,7 @@ class BroadbandModel(ModuleModel):
                     fdy_assembled = np.append(fdy_assembled, abs(measurement.fdy)[idx_xf_lower+1:idx_xf_upper-1])
                     fdy_assembled = np.append(fdy_assembled, yf_interp_upper)
 
-                    first_time_values = (measurement.fdx[idx_xf_lower:idx_xf_upper] + measurement.target_frequency * 1e-6)
+                    first_time_values = (measurement.fdx[idx_xf_lower:idx_xf_upper] + measurement.target_frequency * 1e-6 - offset)
                     first_time_values[0] =  -self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6
                     first_time_values[-1] = +self.frequency_step/2 * 1e-6 + measurement.target_frequency * 1e-6
                     
