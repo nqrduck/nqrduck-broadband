@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file '../Modules/nqrduck-broadband/src/nqrduck_broadband/resources/broadband_widget.ui'
+# Form implementation generated from reading ui file 'Modules/nqrduck-broadband/src/nqrduck_broadband/resources/broadband_widget.ui'
 #
 # Created by: PyQt6 UI code generator 6.5.1
 #
@@ -109,6 +109,15 @@ class Ui_Form(object):
         self.activeLUTLabel = QtWidgets.QLabel(parent=Form)
         self.activeLUTLabel.setObjectName("activeLUTLabel")
         self.gridLayout.addWidget(self.activeLUTLabel, 0, 1, 1, 1)
+        self.minMatchBox = QtWidgets.QSpinBox(parent=Form)
+        self.minMatchBox.setMinimum(-60)
+        self.minMatchBox.setMaximum(0)
+        self.minMatchBox.setProperty("value", -12)
+        self.minMatchBox.setObjectName("minMatchBox")
+        self.gridLayout.addWidget(self.minMatchBox, 1, 1, 1, 1)
+        self.minMatchingActive = QtWidgets.QCheckBox(parent=Form)
+        self.minMatchingActive.setObjectName("minMatchingActive")
+        self.gridLayout.addWidget(self.minMatchingActive, 1, 0, 1, 1)
         self.verticalLayout_3.addLayout(self.gridLayout)
         self.deleteLUTButton = QtWidgets.QPushButton(parent=Form)
         self.deleteLUTButton.setObjectName("deleteLUTButton")
@@ -130,7 +139,7 @@ class Ui_Form(object):
         self.infoBox.setWidgetResizable(True)
         self.infoBox.setObjectName("infoBox")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 271, 677))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 271, 639))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -196,6 +205,7 @@ class Ui_Form(object):
         self.label_10.setText(_translate("Form", "Sequence Settings:"))
         self.label_11.setText(_translate("Form", "Active LUT:"))
         self.activeLUTLabel.setText(_translate("Form", "None"))
+        self.minMatchingActive.setText(_translate("Form", "Minimum Matching (dB)"))
         self.deleteLUTButton.setText(_translate("Form", "Delete LUT"))
         self.label_9.setText(_translate("Form", "Info Box:"))
 from nqrduck.contrib.mplwidget import MplWidget
