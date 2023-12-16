@@ -4,10 +4,13 @@ from collections import OrderedDict
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import pyqtSignal, QObject
 from nqrduck.module.module_model import ModuleModel
+from nqrduck_spectrometer.measurement import Measurement
 
 logger = logging.getLogger(__name__)
 
 class BroadbandModel(ModuleModel):
+    FILE_EXTENSION = "broad"
+
     MIN_FREQUENCY = 30.0
     MAX_FREQUENCY = 200.0
     DEFAULT_FREQUENCY_STEP = 0.1
@@ -168,10 +171,10 @@ class BroadbandModel(ModuleModel):
 
                 # This interpolates the y values of the lower and upper frequency step
                 yf_interp_lower = np.interp(offset-self.frequency_step/2 * 1e-6, [measurement.fdx[idx_xf_lower], measurement.fdx[center]], 
-                                        [abs(measurement.fdy)[idx_xf_lower][0], abs(measurement.fdy)[center][0]])
+                                        [abs(measurement.fdy)[idx_xf_lower], abs(measurement.fdy)[center]])
             
                 yf_interp_upper = np.interp(offset+self.frequency_step/2 * 1e-6, [measurement.fdx[center], measurement.fdx[idx_xf_upper]], 
-                                        [abs(measurement.fdy)[center][0], abs(measurement.fdy)[idx_xf_lower][0]]) 
+                                        [abs(measurement.fdy)[center], abs(measurement.fdy)[idx_xf_lower]]) 
                 
                 try:
                     # We take the last point of the previous spectrum and the first point of the current spectrum and average them
@@ -213,6 +216,34 @@ class BroadbandModel(ModuleModel):
             array = np.asarray(array)
             idx = (np.abs(array - value)).argmin()
             return idx
+        
+        def to_json(self):
+            """Converts the broadband measurement to a json-compatible format."""
+            return {
+                "single_frequency_measurements": [measurement.to_json() for measurement in self.single_frequency_measurements.values()],
+                "reflection": self.reflection
+            }
+        
+        @classmethod
+        def from_json(cls, json):
+            """Converts the json format to a broadband measurement."""
+            # We create a broadband measurement object with the frequencies and frequency step from the first single frequency measurement
+            frequencies = [measurement["target_frequency"] for measurement in json["single_frequency_measurements"]]
+            
+
+            # We need to calculate the frequency step from the first two measurements
+            frequency_step = frequencies[1] - frequencies[0]
+
+            broadband_measurement = cls(frequencies, frequency_step)
+
+            # We add all of the single frequency measurements to the broadband measurement
+            for measurement in json["single_frequency_measurements"]:
+                broadband_measurement.add_measurement(Measurement.from_json(measurement))
+
+            # We assemble the broadband spectrum
+            broadband_measurement.assemble_broadband_spectrum()
+
+            return broadband_measurement
 
         @property
         def single_frequency_measurements(self) -> dict:

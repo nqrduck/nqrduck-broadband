@@ -222,7 +222,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1">
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0,0">
          <item>
           <widget class="QLabel" name="label_9">
            <property name="font">
@@ -256,7 +256,7 @@
               <x>0</x>
               <y>0</y>
               <width>271</width>
-              <height>639</height>
+              <height>559</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -266,6 +266,20 @@
              </sizepolicy>
             </property>
            </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="exportButton">
+           <property name="text">
+            <string>Export Measurement</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="importButton">
+           <property name="text">
+            <string>Import Measurement</string>
+           </property>
           </widget>
          </item>
         </layout>

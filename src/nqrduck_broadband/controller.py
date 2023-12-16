@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import json
 from PyQt6.QtCore import pyqtSlot, pyqtSignal, QTimer
 from PyQt6.QtWidgets import QApplication
 from nqrduck_spectrometer.measurement import Measurement
@@ -191,4 +192,33 @@ class BroadbandController(ModuleController):
         else:
             self.module.nqrduck_signal.emit("start_measurement", None)
             self.module.model.waiting_for_tune_and_match = False
+            QApplication.processEvents()
+
+    def save_measurement(self, file_name : str) -> None:
+        """Saves the current broadband measurement to a file.
+        
+        Args:
+            file_name (str): Name of the file.
+        """
+        logger.debug("Saving measurement to file: " + file_name)
+        self.module.view.add_info_text("Saving measurement to file: " + file_name)
+        QApplication.processEvents()
+    
+        with open(file_name, "w") as f:
+            json.dump(self.module.model.current_broadband_measurement.to_json(), f)
+
+
+    def load_measurement(self, file_name : str) -> None:
+        """Loads a broadband measurement from a file.
+        
+        Args:
+            file_name (str): Name of the file.
+        """
+        logger.debug("Loading measurement from file: " + file_name)
+
+        with open(file_name, "r") as f:
+            measurement = json.load(f)
+            self.module.model.current_broadband_measurement = self.module.model.BroadbandMeasurement.from_json(measurement)
+            self.module.view.add_info_text("Measurement loaded.")
+            self.module.view.on_broadband_measurement_added()
             QApplication.processEvents()

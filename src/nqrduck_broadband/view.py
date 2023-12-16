@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
 from PyQt6.QtWidgets import QWidget, QMessageBox, QApplication, QLabel, QVBoxLayout
-
+from nqrduck.assets.icons import Logos
 from nqrduck.module.module_view import ModuleView
 from .widget import Ui_Form
 
@@ -25,6 +25,16 @@ class BroadbandView(ModuleView):
         )
 
         self.connect_signals()
+
+        # Add logos
+        self._ui_form.start_measurementButton.setIcon(Logos.Play_16x16())
+        self._ui_form.start_measurementButton.setIconSize(self._ui_form.start_measurementButton.size())
+
+        self._ui_form.exportButton.setIcon(Logos.Save16x16())
+        self._ui_form.exportButton.setIconSize(self._ui_form.exportButton.size())
+
+        self._ui_form.importButton.setIcon(Logos.Load16x16())
+        self._ui_form.importButton.setIconSize(self._ui_form.importButton.size())
 
         self.init_plots()
 
@@ -78,6 +88,10 @@ class BroadbandView(ModuleView):
         # On deleteLUTButton clicked
         self._ui_form.deleteLUTButton.clicked.connect(self.module.controller.delete_LUT)
 
+        # Save and load buttons
+        self._ui_form.exportButton.clicked.connect(self.on_save_button_clicked)
+        self._ui_form.importButton.clicked.connect(self.on_load_button_clicked)
+
     @pyqtSlot()
     def start_measurement_clicked(self) -> None:
         """This method is called when the start measurement button is clicked.
@@ -101,6 +115,28 @@ class BroadbandView(ModuleView):
         # Process the user's choice
         if choice == QMessageBox.StandardButton.Yes:
             self.start_broadband_measurement.emit()
+
+    @pyqtSlot()
+    def on_save_button_clicked(self) -> None:
+        """This method is called when the save button is clicked.
+        It shows a file dialog to the user to select a file to save the measurement to.
+        """
+        logger.debug("Save button clicked.")
+        file_manager = self.QFileManager(self.module.model.FILE_EXTENSION, parent=self.widget)
+        file_name = file_manager.saveFileDialog()
+        if file_name:
+            self.module.controller.save_measurement(file_name)
+
+    @pyqtSlot()
+    def on_load_button_clicked(self) -> None:
+        """This method is called when the load button is clicked.
+        It shows a file dialog to the user to select a file to load the measurement from.
+        """
+        logger.debug("Load button clicked.")
+        file_manager = self.QFileManager(self.module.model.FILE_EXTENSION, parent=self.widget)
+        file_name = file_manager.loadFileDialog()
+        if file_name:
+            self.module.controller.load_measurement(file_name)
 
     def init_plots(self) -> None:
         """Initialize the plots."""
