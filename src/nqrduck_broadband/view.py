@@ -173,11 +173,6 @@ class BroadbandView(ModuleView):
         self._ui_form.broadbandPlot.canvas.ax.set_ylabel("Magnitude a.u.")
         self._ui_form.broadbandPlot.canvas.ax.grid()
 
-        # Make second axis for S11 value
-        self._ui_form.broadbandPlot.canvas.ax2 = self._ui_form.broadbandPlot.canvas.ax.twinx()
-        self._ui_form.broadbandPlot.canvas.ax2.set_ylabel("S11 in dB")
-        self._ui_form.broadbandPlot.canvas.ax2.set_ylim([-40, 0])
-
     @pyqtSlot(float)
     def on_start_frequency_change(self, start_frequency: float) -> None:
         """This method is called when the start frequency is changed.
@@ -281,9 +276,16 @@ class BroadbandView(ModuleView):
         # Plot S11 values on the twin axis of the broadband plot
         frequencies  = self.module.model.current_broadband_measurement.reflection.keys()
         frequencies = [frequency * 1e-6 for frequency in frequencies]
+
         reflection_values = self.module.model.current_broadband_measurement.reflection.values()
-        S11plotter = self._ui_form.broadbandPlot.canvas.ax2
-        S11plotter.plot(frequencies, reflection_values, color="red", marker="x", linestyle="None")
+        if reflection_values:
+            self._ui_form.broadbandPlot.canvas.S11ax = self._ui_form.broadbandPlot.canvas.ax.twinx()
+            S11plotter = self._ui_form.broadbandPlot.canvas.S11ax
+            S11plotter.clear()
+            # Make second axis for S11 value
+            self._ui_form.broadbandPlot.canvas.S11ax.set_ylabel("S11 in dB")
+            self._ui_form.broadbandPlot.canvas.S11ax.set_ylim([-40, 0])
+            S11plotter.plot(frequencies, reflection_values, color="red", marker="x", linestyle="None")
 
         self.set_timedomain_labels()
         self.set_frequencydomain_labels()
