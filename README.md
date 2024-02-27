@@ -1,4 +1,4 @@
-# NQRduck Module: nqrduck-autotm
+# NQRduck Module: nqrduck-broadband
 
 A module for the [nqrduck](https://github.com/nqrduck/nqrduck) project. This module is used for broadband magnetic resonance experiments.
 
