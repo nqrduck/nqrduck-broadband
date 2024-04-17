@@ -24,6 +24,7 @@ dependencies = [
     "matplotlib",
     "pyqt6",
     "nqrduck",
+    "nqrduck-spectrometer",
 ]
 
 [project.entry-points."nqrduck"]
