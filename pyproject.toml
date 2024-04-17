@@ -4,12 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nqrduck-broadband"
-version = "0.0.12"
+version = "0.0.13"
 authors = [
-  { name="Julia Pfitzer", email="git@jupfi.me" },
+  { name="jupfi", email="support@nqrduck.cool" },
 ]
 
-description = "A module for the NQRduck program (a simple python script™) to do broadband NQR measurements."
+description = "A module for the NQRduck program (a simple python script™) to do broadband magnetic resonance measurements."
 readme = "README.md"
 license = { file="LICENSE" }
 requires-python = ">=3.8"
@@ -23,8 +23,33 @@ classifiers = [
 dependencies = [
     "matplotlib",
     "pyqt6",
-    "NQRduck",
+    "nqrduck",
 ]
 
 [project.entry-points."nqrduck"]
 "nqrduck-broadband" = "nqrduck_broadband.broadband:Broadband"
+
+[tool.ruff]
+exclude = [
+  "widget.py",
+]
+
+[tool.ruff.lint]
+extend-select = [
+  "UP",  # pyupgrade
+  "D",   # pydocstyle
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[project.urls]
+"Homepage" = "https://nqrduck.cool"
+"Bug Tracker" = "https://github.com/nqrduck/nqrduck-broadband/issues"
+"Source Code" = "https://github.com/nqrduck/nqrduck-broadband"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nqrduck_broadband"]

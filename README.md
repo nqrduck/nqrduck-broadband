@@ -26,6 +26,10 @@ You can install this module and the dependencies by running the following comman
 ```bash
 pip install .
 ```
+Alternatively, you can install the module and the dependencies by running the following command in the terminal while the virtual environment is activated:
+```bash
+pip install nqrduck-broadband
+```
 
 ## Usage
 The module is used with the [ATM-system](https://github.com/nqrduck/ATM) in combination with the [nqrduck-autotm](https://github.com/nqrduck/nqrduck-autotm) module. 
@@ -35,7 +39,7 @@ If you are using a low Q broadband probe coil you don't have to generate a Looku
 
 The pulse sequence and spectrometer settings can be adjusted using the 'Spectrometer' tab. 
 
-<img src="docs/img/broadband_ui_labeled_v2.png" alt="drawing" width="800">
+<img src="https://raw.githubusercontent.com/nqrduck/nqrduck-autotm/d15d85be91195e3e7b514b60b3cef6d1dcde5e1e/docs/img/autotm-labeled.png" alt="drawing" width="800">
 
 - a.) The measurements settings with the frequency range and the number of steps. These settings are locked when generating a Lookup Table.
 - b.) The information about the active Lookup Table.
