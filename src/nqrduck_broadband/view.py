@@ -1,3 +1,4 @@
+"""This module contains the view of the broadband module."""
 import logging
 from datetime import datetime
 from PyQt6.QtCore import pyqtSlot, pyqtSignal, Qt
@@ -10,9 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 class BroadbandView(ModuleView):
+    """View class for the Broadband module.
+    
+    Signals:
+        start_broadband_measurement: Signal to start a broadband measurement.
+    """
     start_broadband_measurement = pyqtSignal()
 
     def __init__(self, module):
+        """Initializes the BroadbandView."""
         super().__init__(module)
 
         widget = QWidget()
@@ -21,14 +28,16 @@ class BroadbandView(ModuleView):
         self.widget = widget
 
         logger.debug(
-            "Facecolor %s" % str(self._ui_form.broadbandPlot.canvas.ax.get_facecolor())
+            f"Facecolor {str(self._ui_form.broadbandPlot.canvas.ax.get_facecolor())}"
         )
 
         self.connect_signals()
 
         # Add logos
         self._ui_form.start_measurementButton.setIcon(Logos.Play_16x16())
-        self._ui_form.start_measurementButton.setIconSize(self._ui_form.start_measurementButton.size())
+        self._ui_form.start_measurementButton.setIconSize(
+            self._ui_form.start_measurementButton.size()
+        )
 
         self._ui_form.exportButton.setIcon(Logos.Save16x16())
         self._ui_form.exportButton.setIconSize(self._ui_form.exportButton.size())
@@ -67,9 +76,13 @@ class BroadbandView(ModuleView):
         )
         self.module.model.stop_frequency_changed.connect(self.on_stop_frequency_change)
         self.module.model.frequency_step_changed.connect(self.on_frequency_step_change)
-        
-        self._ui_form.start_measurementButton.clicked.connect(self.start_measurement_clicked)
-        self.start_broadband_measurement.connect(self.module._controller.start_broadband_measurement)
+
+        self._ui_form.start_measurementButton.clicked.connect(
+            self.start_measurement_clicked
+        )
+        self.start_broadband_measurement.connect(
+            self.module._controller.start_broadband_measurement
+        )
 
         self._ui_form.averagesEdit.editingFinished.connect(
             lambda: self.on_editing_finished(self._ui_form.averagesEdit.text())
@@ -95,10 +108,10 @@ class BroadbandView(ModuleView):
     @pyqtSlot()
     def start_measurement_clicked(self) -> None:
         """This method is called when the start measurement button is clicked.
+
         It shows a dialog asking the user if he really wants to start the measurement.
         If the user clicks yes the start_broadband_measurement signal is emitted.
         """
-
         # Create a QMessageBox object
         msg_box = QMessageBox(parent=self)
         msg_box.setText("Start the measurement?")
@@ -119,10 +132,13 @@ class BroadbandView(ModuleView):
     @pyqtSlot()
     def on_save_button_clicked(self) -> None:
         """This method is called when the save button is clicked.
+
         It shows a file dialog to the user to select a file to save the measurement to.
         """
         logger.debug("Save button clicked.")
-        file_manager = self.QFileManager(self.module.model.FILE_EXTENSION, parent=self.widget)
+        file_manager = self.QFileManager(
+            self.module.model.FILE_EXTENSION, parent=self.widget
+        )
         file_name = file_manager.saveFileDialog()
         if file_name:
             self.module.controller.save_measurement(file_name)
@@ -130,10 +146,13 @@ class BroadbandView(ModuleView):
     @pyqtSlot()
     def on_load_button_clicked(self) -> None:
         """This method is called when the load button is clicked.
+
         It shows a file dialog to the user to select a file to load the measurement from.
         """
         logger.debug("Load button clicked.")
-        file_manager = self.QFileManager(self.module.model.FILE_EXTENSION, parent=self.widget)
+        file_manager = self.QFileManager(
+            self.module.model.FILE_EXTENSION, parent=self.widget
+        )
         file_name = file_manager.loadFileDialog()
         if file_name:
             self.module.controller.load_measurement(file_name)
@@ -176,7 +195,11 @@ class BroadbandView(ModuleView):
     @pyqtSlot(float)
     def on_start_frequency_change(self, start_frequency: float) -> None:
         """This method is called when the start frequency is changed.
+
         It adjusts the view to the new start frequency.
+
+        Args:
+            start_frequency (float) : The new start frequency.
         """
         logger.debug(
             "Adjusting view to new start frequency: " + str(start_frequency * 1e-6)
@@ -189,7 +212,11 @@ class BroadbandView(ModuleView):
     @pyqtSlot(float)
     def on_stop_frequency_change(self, stop_frequency: float) -> None:
         """This method is called when the stop frequency is changed.
+
         It adjusts the view to the new stop frequency.
+
+        Args:
+            stop_frequency (float) : The new stop frequency.
         """
         logger.debug(
             "Adjusting view to new stop frequency: " + str(stop_frequency * 1e-6)
@@ -200,22 +227,32 @@ class BroadbandView(ModuleView):
         self._ui_form.stop_frequencyField.setText(str(stop_frequency * 1e-6))
 
     @pyqtSlot(float)
-    def on_frequency_step_change(self, frequency_step : float) -> None:
+    def on_frequency_step_change(self, frequency_step: float) -> None:
         """This method is called when the frequency step is changed.
+
         It adjusts the view to the new frequency step.
+
+        Args:
+            frequency_step (float) : The new frequency step.
         """
-        logger.debug("Adjusting view to new frequency step: " + str(frequency_step * 1e-6))
-        self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=frequency_step*1e-6)
+        logger.debug(
+            "Adjusting view to new frequency step: " + str(frequency_step * 1e-6)
+        )
+        self._ui_form.broadbandPlot.canvas.ax.set_xlim(right=frequency_step * 1e-6)
         self._ui_form.broadbandPlot.canvas.draw()
         self._ui_form.broadbandPlot.canvas.flush_events()
         # Fix float representation
-        frequency_step = str("{:.2f}".format(frequency_step * 1e-6))
+        frequency_step = str(f"{frequency_step * 1e-6:.2f}")
         self._ui_form.frequencystepEdit.setText(frequency_step)
 
     @pyqtSlot()
     def on_editing_finished(self, value: str) -> None:
         """This method is called when the user finished editing a field.
+
         It sets the value of the field in the model.
+
+        Args:
+            value (str) : The value of the field.
         """
         logger.debug("Editing finished by.")
         self.sender().setStyleSheet("")
@@ -225,6 +262,7 @@ class BroadbandView(ModuleView):
     @pyqtSlot()
     def on_set_averages_failure(self) -> None:
         """This method is called when the averages could not be set.
+
         It sets the border of the averages field to red indicating that the entered value was not valid.
         """
         logger.debug("Set averages failure.")
@@ -233,6 +271,7 @@ class BroadbandView(ModuleView):
     @pyqtSlot()
     def on_set_frequency_step_failure(self) -> None:
         """This method is called when the frequency step could not be set.
+
         It sets the border of the frequency step field to red indicating that the entered value was not valid.
         """
         logger.debug("Set frequency step failure.")
@@ -241,13 +280,12 @@ class BroadbandView(ModuleView):
     @pyqtSlot()
     def on_broadband_measurement_added(self) -> None:
         """This method is called when a new broadband measurement is added to the model.
+
         It updates the plots and the progress bar.
         """
         # Get last measurement from the broadband measurement object that is not None
         logger.debug("Updating broadband plot.")
-        measurement = (
-            self.module.model.current_broadband_measurement.get_last_completed_measurement()
-        )
+        measurement = self.module.model.current_broadband_measurement.get_last_completed_measurement()
 
         td_plotter = self._ui_form.time_domainPlot.canvas.ax
         fd_plotter = self._ui_form.frequency_domainPlot.canvas.ax
@@ -257,14 +295,49 @@ class BroadbandView(ModuleView):
         fd_plotter.clear()
         broadband_plotter.clear()
 
-        td_plotter.plot(measurement.tdx, measurement.tdy.real, label="Real", linestyle="-", alpha=0.35, color="red")
-        td_plotter.plot(measurement.tdx, measurement.tdy.imag, label="Imaginary", linestyle="-", alpha=0.35, color="green")
-        td_plotter.plot(measurement.tdx, abs(measurement.tdy), label="Magnitude", color="blue")
+        td_plotter.plot(
+            measurement.tdx,
+            measurement.tdy.real,
+            label="Real",
+            linestyle="-",
+            alpha=0.35,
+            color="red",
+        )
+        td_plotter.plot(
+            measurement.tdx,
+            measurement.tdy.imag,
+            label="Imaginary",
+            linestyle="-",
+            alpha=0.35,
+            color="green",
+        )
+        td_plotter.plot(
+            measurement.tdx, abs(measurement.tdy), label="Magnitude", color="blue"
+        )
         td_plotter.legend()
 
-        fd_plotter.plot(measurement.fdx * 1e-6, measurement.fdy.real, label="Real", linestyle="-", alpha=0.35, color="red")
-        fd_plotter.plot(measurement.fdx * 1e-6, measurement.fdy.imag, label="Imaginary", linestyle="-", alpha=0.35, color="green")
-        fd_plotter.plot(measurement.fdx * 1e-6, abs(measurement.fdy), label="Magnitude", color="blue")
+        fd_plotter.plot(
+            measurement.fdx * 1e-6,
+            measurement.fdy.real,
+            label="Real",
+            linestyle="-",
+            alpha=0.35,
+            color="red",
+        )
+        fd_plotter.plot(
+            measurement.fdx * 1e-6,
+            measurement.fdy.imag,
+            label="Imaginary",
+            linestyle="-",
+            alpha=0.35,
+            color="green",
+        )
+        fd_plotter.plot(
+            measurement.fdx * 1e-6,
+            abs(measurement.fdy),
+            label="Magnitude",
+            color="blue",
+        )
         fd_plotter.legend()
 
         # Plot real and imag part again here in time and frequency domain
@@ -274,18 +347,28 @@ class BroadbandView(ModuleView):
         )
 
         # Plot S11 values on the twin axis of the broadband plot
-        frequencies  = self.module.model.current_broadband_measurement.reflection.keys()
+        frequencies = self.module.model.current_broadband_measurement.reflection.keys()
         frequencies = [frequency * 1e-6 for frequency in frequencies]
 
-        reflection_values = self.module.model.current_broadband_measurement.reflection.values()
+        reflection_values = (
+            self.module.model.current_broadband_measurement.reflection.values()
+        )
         if reflection_values:
-            self._ui_form.broadbandPlot.canvas.S11ax = self._ui_form.broadbandPlot.canvas.ax.twinx()
+            self._ui_form.broadbandPlot.canvas.S11ax = (
+                self._ui_form.broadbandPlot.canvas.ax.twinx()
+            )
             S11plotter = self._ui_form.broadbandPlot.canvas.S11ax
             S11plotter.clear()
             # Make second axis for S11 value
             self._ui_form.broadbandPlot.canvas.S11ax.set_ylabel("S11 in dB")
             self._ui_form.broadbandPlot.canvas.S11ax.set_ylim([-40, 0])
-            S11plotter.plot(frequencies, reflection_values, color="red", marker="x", linestyle="None")
+            S11plotter.plot(
+                frequencies,
+                reflection_values,
+                color="red",
+                marker="x",
+                linestyle="None",
+            )
 
         self.set_timedomain_labels()
         self.set_frequencydomain_labels()
@@ -320,14 +403,14 @@ class BroadbandView(ModuleView):
             self._ui_form.frequencystepEdit.setEnabled(True)
             self._ui_form.activeLUTLabel.setText("None")
 
-    def add_info_text(self, text : str) -> None:
+    def add_info_text(self, text: str) -> None:
         """Add a text to the info box with a timestamp.
 
         Args:
             text (str): The text to add to the info box.
         """
         timestamp = datetime.now().strftime("%H:%M:%S")
-        text = "[%s] %s" % (timestamp, text)
+        text = f"[{timestamp}] {text}"
         text_label = QLabel(text)
         text_label.setStyleSheet("font-size: 25px;")
         self._ui_form.scrollAreaWidgetContents.layout().addWidget(text_label)

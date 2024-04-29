@@ -1,3 +1,4 @@
+"""Module creation for the Broadband module."""
 from nqrduck.module.module import Module
 from .model import BroadbandModel
 from .view import BroadbandView

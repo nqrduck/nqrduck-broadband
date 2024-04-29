@@ -1,3 +1,5 @@
+"""This module contains the BroadbandController class."""
+
 import logging
 import numpy as np
 import json
@@ -10,11 +12,20 @@ logger = logging.getLogger(__name__)
 
 
 class BroadbandController(ModuleController):
+    """Controller class for the Broadband module.
+
+    Signals:
+        start_broadband_measurement: Signal to start a broadband measurement.
+        set_averages_failure: Signal that the set averages command failed.
+        set_frequency_step_failure: Signal that the set frequency step command failed.
+    """
+
     start_broadband_measurement = pyqtSignal()
     set_averages_failure = pyqtSignal()
     set_frequency_step_failure = pyqtSignal()
 
     def __init__(self, module):
+        """Initializes the BroadbandController."""
         super().__init__(module)
 
     @pyqtSlot(str, object)
@@ -27,7 +38,10 @@ class BroadbandController(ModuleController):
         """
         logger.debug(self.module.model.waiting_for_tune_and_match)
 
-        if key == "measurement_data" and  self.module.model.current_broadband_measurement is not None:
+        if (
+            key == "measurement_data"
+            and self.module.model.current_broadband_measurement is not None
+        ):
             logger.debug("Received single measurement.")
             self.module.model.current_broadband_measurement.add_measurement(value)
 
@@ -38,22 +52,27 @@ class BroadbandController(ModuleController):
             logger.debug("Received set averages failure.")
             self.set_averages_failure.emit()
         # receive LUT data
-        elif key  == "LUT_finished":
+        elif key == "LUT_finished":
             self.received_LUT(value)
 
-        elif key == "confirm_tune_and_match" and self.module.model.waiting_for_tune_and_match:
+        elif (
+            key == "confirm_tune_and_match"
+            and self.module.model.waiting_for_tune_and_match
+        ):
             logger.debug("Confirmed tune and match.")
             reflection = value
             logger.debug("Reflection: " + str(reflection))
             if reflection is not None:
-                self.module.model.current_broadband_measurement.add_tune_and_match(reflection)
+                self.module.model.current_broadband_measurement.add_tune_and_match(
+                    reflection
+                )
             self.module.nqrduck_signal.emit("start_measurement", None)
             QApplication.processEvents()
             self.module.model.waiting_for_tune_and_match = False
 
-    def received_LUT(self, LUT : Measurement) -> None:
+    def received_LUT(self, LUT: Measurement) -> None:
         """This slot is called when the LUT data is received from the nqrduck module.
-        
+
         Args:
             LUT (Measurement): LUT data.
         """
@@ -62,7 +81,7 @@ class BroadbandController(ModuleController):
         self.change_start_frequency(self.module.model.LUT.start_frequency)
         self.change_stop_frequency(self.module.model.LUT.stop_frequency)
         self.change_frequency_step(self.module.model.LUT.frequency_step)
-        
+
     @pyqtSlot(str)
     def set_frequency(self, value: str) -> None:
         """Emits the set frequency signal to the nqrduck module.
@@ -150,6 +169,7 @@ class BroadbandController(ModuleController):
     @pyqtSlot()
     def on_broadband_measurement_added(self) -> None:
         """This slot is called when a single measurement is added to the broadband measurement.
+
         It then checks if there are more frequencies to measure and if so, starts the next measurement.
         Furthermore it updates the plots.
         """
@@ -157,11 +177,11 @@ class BroadbandController(ModuleController):
         # Check if there are more frequencies to measure
         if not self.module.model.current_broadband_measurement.is_complete():
             # Get the next frequency to measure
-            next_frequency = (
-                self.module.model.current_broadband_measurement.get_next_measurement_frequency()
-            )
+            next_frequency = self.module.model.current_broadband_measurement.get_next_measurement_frequency()
             logger.debug("Next frequency: " + str(next_frequency))
-            QTimer.singleShot(500, lambda: self.start_single_measurement(next_frequency))
+            QTimer.singleShot(
+                500, lambda: self.start_single_measurement(next_frequency)
+            )
             QApplication.processEvents()
         else:
             self.module.view.add_info_text("Broadband measurement finished.")
@@ -171,14 +191,16 @@ class BroadbandController(ModuleController):
         """This slot is called when the LUT is deleted."""
         self.module.model.LUT = None
 
-    def start_single_measurement(self, frequency : float) -> None:
+    def start_single_measurement(self, frequency: float) -> None:
         """Starts a single measurement.
-        
+
         Args:
             frequency (float): Frequency in MHz.
         """
         logger.debug("Starting single measurement.")
-        self.module.view.add_info_text("Starting measurement at frequency: " + str(frequency))
+        self.module.view.add_info_text(
+            "Starting measurement at frequency: " + str(frequency)
+        )
         # First set the frequency of the spectrometer
         self.module.nqrduck_signal.emit("set_frequency", str(frequency))
         QApplication.processEvents()
@@ -186,7 +208,7 @@ class BroadbandController(ModuleController):
         if self.module.model.LUT is not None:
             self.module.model.waiting_for_tune_and_match = True
             # We need the entry number of the LUT for the current frequency
-            
+
             self.module.nqrduck_signal.emit("set_tune_and_match", frequency * 1e-6)
             QApplication.processEvents()
         else:
@@ -194,31 +216,32 @@ class BroadbandController(ModuleController):
             self.module.model.waiting_for_tune_and_match = False
             QApplication.processEvents()
 
-    def save_measurement(self, file_name : str) -> None:
+    def save_measurement(self, file_name: str) -> None:
         """Saves the current broadband measurement to a file.
-        
+
         Args:
             file_name (str): Name of the file.
         """
         logger.debug("Saving measurement to file: " + file_name)
         self.module.view.add_info_text("Saving measurement to file: " + file_name)
         QApplication.processEvents()
-    
+
         with open(file_name, "w") as f:
             json.dump(self.module.model.current_broadband_measurement.to_json(), f)
 
-
-    def load_measurement(self, file_name : str) -> None:
+    def load_measurement(self, file_name: str) -> None:
         """Loads a broadband measurement from a file.
-        
+
         Args:
             file_name (str): Name of the file.
         """
         logger.debug("Loading measurement from file: " + file_name)
 
-        with open(file_name, "r") as f:
+        with open(file_name) as f:
             measurement = json.load(f)
-            self.module.model.current_broadband_measurement = self.module.model.BroadbandMeasurement.from_json(measurement)
+            self.module.model.current_broadband_measurement = (
+                self.module.model.BroadbandMeasurement.from_json(measurement)
+            )
             self.module.view.add_info_text("Measurement loaded.")
             self.module.view.on_broadband_measurement_added()
             QApplication.processEvents()
