@@ -136,7 +136,7 @@ class BroadbandView(ModuleView):
         It shows a file dialog to the user to select a file to save the measurement to.
         """
         logger.debug("Save button clicked.")
-        file_manager = self.QFileManager(
+        file_manager = self.FileManager(
             self.module.model.FILE_EXTENSION, parent=self.widget
         )
         file_name = file_manager.saveFileDialog()
@@ -150,7 +150,7 @@ class BroadbandView(ModuleView):
         It shows a file dialog to the user to select a file to load the measurement from.
         """
         logger.debug("Load button clicked.")
-        file_manager = self.QFileManager(
+        file_manager = self.FileManager(
             self.module.model.FILE_EXTENSION, parent=self.widget
         )
         file_name = file_manager.loadFileDialog()
