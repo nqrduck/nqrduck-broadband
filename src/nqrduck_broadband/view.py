@@ -106,6 +106,12 @@ class BroadbandView(ModuleView):
         self._ui_form.importButton.clicked.connect(self.on_load_button_clicked)
 
     @pyqtSlot()
+    def on_settings_changed(self) -> None:
+        """Redraw the plots in case the according settings have changed."""
+        logger.debug("Settings changed.")
+        self.init_plots()
+
+    @pyqtSlot()
     def start_measurement_clicked(self) -> None:
         """This method is called when the start measurement button is clicked.
 
@@ -160,14 +166,17 @@ class BroadbandView(ModuleView):
     def init_plots(self) -> None:
         """Initialize the plots."""
         # Initialization of broadband spectrum
+        self._ui_form.broadbandPlot.canvas.ax.clear()
         self._ui_form.broadbandPlot.canvas.ax.set_xlim([0, 250])
         self.set_broadband_labels()
 
         # Initialization of last measurement time domain
+        self._ui_form.time_domainPlot.canvas.ax.clear()
         self._ui_form.time_domainPlot.canvas.ax.set_xlim([0, 250])
         self.set_timedomain_labels()
 
         # Initialization of last measurement frequency domain
+        self._ui_form.frequency_domainPlot.canvas.ax.clear()
         self._ui_form.frequency_domainPlot.canvas.ax.set_xlim([0, 250])
         self.set_frequencydomain_labels()
 
