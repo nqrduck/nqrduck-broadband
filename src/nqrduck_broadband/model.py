@@ -6,7 +6,7 @@ from collections import OrderedDict
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import pyqtSignal, QObject
 from nqrduck.module.module_model import ModuleModel
-from nqrduck_spectrometer.measurement import Measurement
+from quackseq.measurement import Measurement
 
 logger = logging.getLogger(__name__)
 

@@ -25,6 +25,7 @@ dependencies = [
     "pyqt6",
     "nqrduck",
     "nqrduck-spectrometer",
+    "quackseq",
 ]
 
 [project.entry-points."nqrduck"]
