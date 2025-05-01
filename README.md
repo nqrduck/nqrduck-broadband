@@ -1,8 +1,8 @@
 # NQRduck Module: nqrduck-broadband
 
-A module for the [nqrduck](https://github.com/nqrduck/nqrduck) project. This module is used for broadband magnetic resonance experiments.
+A module for the [nqrduck](https://git.private.coffee/nqrduck/nqrduck) project. This module is used for broadband magnetic resonance experiments.
 
-Tuning and Matching is done using the [ATM-system](https://github.com/nqrduck/ATM) in combination with the [nqrduck-autotm](https://github.com/nqrduck/nqrduck-autotm) module.
+Tuning and Matching is done using the [ATM-system](https://git.private.coffee/nqrduck/ATM) in combination with the [nqrduck-autotm](https://git.private.coffee/nqrduck/nqrduck-autotm) module.
 
 For mechanically tunable probe coils stepper motors for Tuning and Matching are used. 
 For electrically tunable probe coils varactor diodes are used. The system is able to output a Tuning and Matching voltage in a range from 0 to 5V.
@@ -13,7 +13,7 @@ For electrically tunable probe coils varactor diodes are used. The system is abl
 Dependencies are handled via the pyproject.toml file.
 
 ### Setup
-To install the module you need the NQRduck core. You can find the installation instructions for the NQRduck core [here](https://github.com/nqrduck/nqrduck).
+To install the module you need the NQRduck core. You can find the installation instructions for the NQRduck core [here](https://git.private.coffee/nqrduck/nqrduck).
 
 Ideally you should install the module in a virtual environment. You can create a virtual environment by running the following command in the terminal:
 ```bash
@@ -32,7 +32,7 @@ pip install nqrduck-broadband
 ```
 
 ## Usage
-The module is used with the [ATM-system](https://github.com/nqrduck/ATM) in combination with the [nqrduck-autotm](https://github.com/nqrduck/nqrduck-autotm) module. 
+The module is used with the [ATM-system](https://git.private.coffee/nqrduck/ATM) in combination with the [nqrduck-autotm](https://git.private.coffee/nqrduck/nqrduck-autotm) module. 
 
 Depending on what kind of probe coil is used you can generate a Lookup Table for a certain frequency range using the 'Tuning and Matching' tab.
 If you are using a low Q broadband probe coil you don't have to generate a Lookup Table.
@@ -55,4 +55,4 @@ The pulse sequence and spectrometer settings can be adjusted using the 'Spectrom
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Contributing
-If you're interested in contributing to the project, start by checking out our [nqrduck-module template](https://github.com/nqrduck/nqrduck-module). To contribute to existing modules, please first open an issue in the respective module repository to discuss your ideas or report bugs.
+If you're interested in contributing to the project, start by checking out our [nqrduck-module template](https://git.private.coffee/nqrduck/nqrduck-module). To contribute to existing modules, please first open an issue in the respective module repository to discuss your ideas or report bugs.

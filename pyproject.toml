@@ -49,8 +49,8 @@ convention = "google"
 
 [project.urls]
 "Homepage" = "https://nqrduck.cool"
-"Bug Tracker" = "https://github.com/nqrduck/nqrduck-broadband/issues"
-"Source Code" = "https://github.com/nqrduck/nqrduck-broadband"
+"Bug Tracker" = "https://git.private.coffee/nqrduck/nqrduck-broadband/issues"
+"Source Code" = "https://git.private.coffee/nqrduck/nqrduck-broadband"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nqrduck_broadband"]
