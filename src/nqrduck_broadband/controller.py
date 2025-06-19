@@ -5,7 +5,7 @@ import numpy as np
 import json
 from PyQt6.QtCore import pyqtSlot, pyqtSignal, QTimer
 from PyQt6.QtWidgets import QApplication
-from nqrduck_spectrometer.measurement import Measurement
+from quackseq.measurement import Measurement
 from nqrduck.module.module_controller import ModuleController
 
 logger = logging.getLogger(__name__)
